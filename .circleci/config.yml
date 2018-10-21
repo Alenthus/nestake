@@ -1,0 +1,15 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: /home/nestake
+    docker:
+    - image: madduci/docker-linux-cpp
+    steps:
+    - run: apt-get -y update
+    - run: apt-get -y install git
+    - checkout
+    - run: mkdir cmake && cd cmake && git clone https://github.com/Crascit/DownloadProject
+    - run: cmake .
+    - run: make
+    - run: make test
