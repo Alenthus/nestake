@@ -4,6 +4,7 @@
 // Addressing mode struct for expressing each addressing mode as int
 
 using std::string;
+using std::array;
 
 namespace cpu {
     struct InstructionName {
@@ -84,20 +85,20 @@ namespace cpu {
         const string XAA = "XAA";
     };
 
-    struct AddressingMode {
-        const string Absolute = "Absolute";
-        const string AbsoluteX = "AbsoluteX";
-        const string AbsoluteY = "AbsoluteY";
-        const string Accumulator = "Accumulator";
-        const string Immediate = "Immediate";
-        const string Implied = "Implied";
-        const string IndexedIndirect = "IndexedIndirect";
-        const string Indirect = "Indirect";
-        const string IndirectIndexed = "IndirectIndexed";
-        const string Relative = "Relative";
-        const string ZeroPage = "ZeroPage";
-        const string ZeroPageX = "ZeroPageX";
-        const string ZeroPageY = "ZeroPageY";
+    enum AddressingMode {
+        Absolute = 1,
+        AbsoluteX,
+        AbsoluteY,
+        Accumulator ,
+        Immediate,
+        Implied,
+        IndexedIndirect,
+        Indirect,
+        IndirectIndexed,
+        Relative,
+        ZeroPage,
+        ZeroPageX,
+        ZeroPageY,
     };
 
     // type of interruption
@@ -110,5 +111,5 @@ namespace cpu {
     /*
      *  Array of instruction params to be selected by its corresponding bits.
      */
-    std::array<InstructionParams, 256> InstructionTable = {};
+    array<InstructionParams, 256> InstructionTable = {};
 }

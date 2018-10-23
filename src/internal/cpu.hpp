@@ -6,8 +6,6 @@
 #include <string>
 #include "memory.hpp"
 
-using std::string;
-
 class NesCpu {
 public:
     // pointer to NesMemory interface
@@ -63,15 +61,15 @@ public:
 };
 
 // interface of instruction executor
-typedef void (*InstructionExecutor) (NesCpu* cpu);
+typedef void (*InstructionExecutor) (NesCpu* cpu, uint16_t address, uint16_t pc, bool is_accumulator_mode);
 
 // struct consisting of information for instruction execution
 struct InstructionParams {
     // instruction's name ... ex.) NOP
-    string InstructionName;
+    std::string InstructionName;
 
     // addressing mode ... ex.) Zeropage
-    string AddressingMode;
+    std::string AddressingMode;
 
     // the size of each instruction in byte
     uint8_t InstructionSizes;
