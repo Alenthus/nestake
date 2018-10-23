@@ -1,12 +1,13 @@
 #ifndef NESTAKE_CPU
 #define NESTAKE_CPU
 
+#include <array>
 #include <map>
+#include <string>
 #include "memory.hpp"
 
 class NesCpu {
 public:
-
     // pointer to NesMemory interface
     NesMemory* Memory;
 
@@ -57,6 +58,29 @@ public:
 
     // number of cycles to stall
     int stall;
+};
+
+// interface of instruction executor
+typedef void (*InstructionExecutor) (NesCpu* cpu);
+
+// struct consisting of information for instruction execution
+struct InstructionParams {
+    // instruction's name ... ex.) NOP
+    std::string InstructionName;
+
+    // addressing mode ... ex.) Zeropage
+    std::string AddressingMode;
+
+    // the size of each instruction in byte
+    uint8_t InstructionSizes;
+
+    // the number of cycles used by the instruction
+    uint8_t InstructionCycle;
+
+    // the number of page cycles used by the instruction
+    uint8_t PageCycle;
+
+    InstructionExecutor executor;
 };
 
 #endif
