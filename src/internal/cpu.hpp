@@ -58,6 +58,14 @@ public:
 
     // number of cycles to stall
     int stall;
+
+    // core method for executing instructions
+    int Step();
+
+    // interrupting methods
+    void nmi();
+    void irq();
+
 };
 
 // interface of instruction executor
@@ -69,7 +77,7 @@ struct InstructionParams {
     std::string InstructionName;
 
     // addressing mode ... ex.) Zeropage
-    std::string AddressingMode;
+    uint8_t AddressingMode;
 
     // the size of each instruction in byte
     uint8_t InstructionSizes;
@@ -82,5 +90,4 @@ struct InstructionParams {
 
     InstructionExecutor executor;
 };
-
 #endif
