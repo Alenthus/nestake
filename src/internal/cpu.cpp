@@ -1,5 +1,6 @@
 #include <string>
 #include "cpu.hpp"
+#include "memory.cpp"
 
 // Addressing mode struct for expressing each addressing mode as int
 
@@ -112,9 +113,24 @@ enum InterruptType {
 // Array of instruction params to be selected by its corresponding bits.
 array<InstructionParams*, 256> InstructionTable = {};
 
+uint16_t NesCpu::Read16(uint16_t address) {
+    uint16_t lo = Memory->Read(address);
+    uint16_t hi = Memory->Read(address +1) <<8;
+    return hi || lo;
+}
+
+void NesCpu::TriggerIRQ() {
+    interrupt = interruptIRQ;
+}
+
+void NesCpu::TriggerNMI() {
+    interrupt = interruptNMI;
+}
+
 
 // TODO: implement
 void NesCpu::irq() {}
+
 void NesCpu::nmi() {}
 
 int NesCpu::Step() {
@@ -144,19 +160,45 @@ int NesCpu::Step() {
 
     // switching the instruction's condition depending on addressing mode
     switch (inst->AddressingMode) {
-        case Absolute : {}
-        case AbsoluteX: {}
-        case AbsoluteY: {}
-        case Accumulator: {}
-        case Immediate: {}
-        case Implied: {}
-        case IndexedIndirect: {}
-        case Indirect: {}
-        case IndirectIndexed: {}
-        case Relative: {}
-        case ZeroPage: {}
-        case ZeroPageX: {}
-        case ZeroPageY: {}
+        case Absolute : {
+            address = Read16(PC + 1);
+        }
+        case AbsoluteX: {
+            address = Read16(PC + 1) + uint8_t(X);
+        }
+        case AbsoluteY: {
+
+        }
+        case Accumulator: {
+
+        }
+        case Immediate: {
+
+        }
+        case Implied: {
+
+        }
+        case IndexedIndirect: {
+
+        }
+        case Indirect: {
+
+        }
+        case IndirectIndexed: {
+
+        }
+        case Relative: {
+
+        }
+        case ZeroPage: {
+
+        }
+        case ZeroPageX: {
+
+        }
+        case ZeroPageY: {
+
+        }
         default: {
             PC += inst->InstructionSizes;
             Cycles += inst->InstructionCycle;

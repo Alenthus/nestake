@@ -62,10 +62,14 @@ public:
     // core method for executing instructions
     int Step();
 
-    // interrupting methods
-    void nmi();
+    // interruption related methods
+    void TriggerIRQ();
+    void TriggerNMI();
     void irq();
+    void nmi();
 
+    // memory related
+    uint16_t Read16(uint16_t);
 };
 
 // interface of instruction executor
