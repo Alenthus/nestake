@@ -3,7 +3,6 @@
 
 #include <array>
 #include <map>
-#include <string>
 #include "memory.hpp"
 
 class NesCpu {
@@ -60,7 +59,7 @@ public:
     int stall;
 
     // core method for executing instructions
-    int Step();
+    uint64_t Step();
 
     // interruption related methods
     void TriggerIRQ();
@@ -70,6 +69,7 @@ public:
 
     // memory related
     uint16_t Read16(uint16_t);
+    uint16_t Read16Bug(uint16_t);
 };
 
 // interface of instruction executor
@@ -77,10 +77,10 @@ typedef void (*InstructionExecutor) (NesCpu* cpu, uint16_t address, uint16_t pc,
 
 // struct consisting of information for instruction execution
 struct InstructionParams {
-    // instruction's name ... ex.) NOP
-    std::string InstructionName;
+    // instruction's id
+    uint8_t ID;
 
-    // addressing mode ... ex.) Zeropage
+    // addressing mode
     uint8_t AddressingMode;
 
     // the size of each instruction in byte

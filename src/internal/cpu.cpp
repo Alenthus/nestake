@@ -1,104 +1,36 @@
-#include <string>
 #include "cpu.hpp"
+#include <string>
 #include "memory.cpp"
 
 // Addressing mode struct for expressing each addressing mode as int
 
-using std::string;
 using std::array;
+using std::map;
+using std::string;
 
-struct InstructionName {
-    const string ADC = "ADC";
-    const string AHX = "AHX";
-    const string ALR = "ALR";
-    const string ANC = "ANC";
-    const string AND = "AND";
-    const string ARR = "ARR";
-    const string ASL = "ASL";
-    const string AXS = "AXS";
-    const string BCC = "BCC";
-    const string BCS = "BCS";
-    const string BEQ = "BEQ";
-    const string BIT = "BIT";
-    const string BMI = "BMI";
-    const string BNE = "BNE";
-    const string BPL = "BPL";
-    const string BRK = "BRK";
-    const string BVC = "BVC";
-    const string BVS = "BVS";
-    const string CLC = "CLC";
-    const string CLD = "CLD";
-    const string CLI = "CLI";
-    const string CLV = "CLV";
-    const string CMP = "CMP";
-    const string CPX = "CPX";
-    const string CPY = "CPY";
-    const string DCP = "DCP";
-    const string DEC = "DEC";
-    const string DEX = "DEX";
-    const string DEY = "DEY";
-    const string EOR = "EOR";
-    const string INC = "INC";
-    const string INX = "INX";
-    const string INY = "INY";
-    const string ISC = "ISC";
-    const string JMP = "JMP";
-    const string JSR = "JSR";
-    const string KIL = "KIL";
-    const string LAS = "LAS";
-    const string LAX = "LAX";
-    const string LDA = "LDA";
-    const string LDX = "LDX";
-    const string LDY = "LDY";
-    const string LSR = "LSR";
-    const string NOP = "NOP";
-    const string ORA = "ORA";
-    const string PHA = "PHA";
-    const string PHP = "PHP";
-    const string PLA = "PLA";
-    const string PLP = "PLP";
-    const string RLA = "RLA";
-    const string ROL = "ROL";
-    const string ROR = "ROR";
-    const string RRA = "RRA";
-    const string RTI = "RTI";
-    const string RTS = "RTS";
-    const string SAX = "SAX";
-    const string SBC = "SBC";
-    const string SEC = "SEC";
-    const string SED = "SED";
-    const string SEI = "SEI";
-    const string SHX = "SHX";
-    const string SHY = "SHY";
-    const string SLO = "SLO";
-    const string SRE = "SRE";
-    const string STA = "STA";
-    const string STX = "STX";
-    const string STY = "STY";
-    const string TAS = "TAS";
-    const string TAX = "TAX";
-    const string TAY = "TAY";
-    const string TSX = "TSX";
-    const string TXA = "TXA";
-    const string TXS = "TXS";
-    const string TYA = "TYA";
-    const string XAA = "XAA";
+enum InstructionID {
+    ADC = 1, AHX, ALR, ANC, AND, ARR, ASL, AXS, BCC, BCS, BEQ, BIT, BMI,
+    BNE, BPL, BRK, BVC, BVS, CLC, CLD, CLI, CLV, CMP, CPX, CPY, DCP, DEC,
+    DEX, DEY, EOR, INC, INX, INY, ISC, JMP, JSR, KIL, LAS, LAX, LDA, LDX,
+    LDY, LSR, NOP, ORA, PHA, PHP, PLA, PLP, RLA, ROL, ROR, RRA, RTI, RTS,
+    SAX, SBC, SEC, SED, SEI, SHX, SHY, SLO, SRE, STA, STX, STY, TAS, TAX,
+    TAY, TSX, TXA, TXS, TYA, XAA,
 };
 
+map<uint8_t, string> idToInstructionName = {
+        {ADC, "ADC"}, {AHX, "AHX"}, {ALR, "ALR"}, {ANC, "ANC"}, {AND, "AND"}, {ARR, "ARR"}, {ASL, "ASL"}, {AXS, "AXS"}, {BCC, "BCC"}, {BCS, "BCS"}, {BEQ, "BEQ"}, {BIT, "BIT"}, {BMI, "BMI"}, {BNE, "BNE"}, {BPL, "BPL"}, {BRK, "BRK"},
+        {BVC, "BVC"}, {BVS, "BVS"}, {CLC, "CLC"}, {CLD, "CLD"}, {CLI, "CLI"}, {CLV, "CLV"}, {CMP, "CMP"}, {CPX, "CPX"}, {CPY, "CPY"}, {DCP, "DCP"}, {DEC, "DEC"}, {DEX, "DEX"}, {DEY, "DEY"}, {EOR, "EOR"}, {INC, "INC"}, {INX, "INX"},
+        {INY, "INY"}, {ISC, "ISC"}, {JMP, "JMP"}, {JSR, "JSR"}, {KIL, "KIL"}, {LAS, "LAS"}, {LAX, "LAX"}, {LDA, "LDA"}, {LDX, "LDX"}, {LDY, "LDY"}, {LSR, "LSR"}, {NOP, "NOP"}, {ORA, "ORA"}, {PHA, "PHA"}, {PHP, "PHP"}, {PLA, "PLA"},
+        {PLP, "PLP"}, {RLA, "RLA"}, {ROL, "ROL"}, {ROR, "ROR"}, {RRA, "RRA"}, {RTI, "RTI"}, {RTS, "RTS"}, {SAX, "SAX"}, {SBC, "SBC"}, {SEC, "SEC"}, {SED, "SED"}, {SEI, "SEI"}, {SHX, "SHX"}, {SHY, "SHY"}, {SLO, "SLO"}, {SRE, "SRE"},
+        {STA, "STA"}, {STX, "STX"}, {STY, "STY"}, {TAS, "TAS"}, {TAX, "TAX"}, {TAY, "TAY"}, {TSX, "TSX"}, {TXA, "TXA"}, {TXS, "TXS"}, {TYA, "TYA"}, {XAA, "XAA"}
+};
+
+
 enum AddressingMode {
-    Absolute = 1,
-    AbsoluteX,
-    AbsoluteY,
-    Accumulator ,
-    Immediate,
-    Implied,
-    IndexedIndirect,
-    Indirect,
-    IndirectIndexed,
-    Relative,
-    ZeroPage,
-    ZeroPageX,
-    ZeroPageY,
+    Absolute = 1, AbsoluteX, AbsoluteY, Accumulator,
+    Immediate, Implied, IndexedIndirect, Indirect,
+    IndirectIndexed, Relative, ZeroPage, ZeroPageX,
+    ZeroPageY
 };
 
 // type of interruption
@@ -108,6 +40,12 @@ enum InterruptType {
     interruptIRQ,
 };
 
+bool isPageDiffer(uint16_t a, uint16_t b) {
+    // TODO: implement
+    return true;
+}
+
+
 // TODO: implement all instructions and append the following InstructionTable array
 
 // Array of instruction params to be selected by its corresponding bits.
@@ -115,8 +53,13 @@ array<InstructionParams*, 256> InstructionTable = {};
 
 uint16_t NesCpu::Read16(uint16_t address) {
     uint16_t lo = Memory->Read(address);
-    uint16_t hi = Memory->Read(address +1) <<8;
-    return hi || lo;
+    uint16_t hi = Memory->Read(address + uint16_t(1)) <<8;
+    return hi | lo;
+}
+
+uint16_t NesCpu::Read16Bug(uint16_t) {
+    // TODO: implement
+    return 0;
 }
 
 void NesCpu::TriggerIRQ() {
@@ -133,7 +76,7 @@ void NesCpu::irq() {}
 
 void NesCpu::nmi() {}
 
-int NesCpu::Step() {
+uint64_t NesCpu::Step() {
 
     // stall cpu cycle
     if (stall > 0) {
@@ -144,68 +87,73 @@ int NesCpu::Step() {
     switch (interrupt) {
         case interruptNMI:
             nmi();
+            break;
         case interruptIRQ:
             irq();
-        default:
-            // reset interrupt flag
-            interrupt = interruptNone;
+            break;
+        default:{}
     }
-
+    // reset interrupt flag
+    interrupt = interruptNone;
 
     // auxiliary variables
-    int prev_cycles = Cycles;
-    uint16_t address;
-    bool page_crossed;
+    uint64_t prev_cycles = Cycles;
+    uint16_t address = 0;
+    bool page_crossed = false;
     InstructionParams* inst = InstructionTable[PC];
 
     // switching the instruction's condition depending on addressing mode
     switch (inst->AddressingMode) {
         case Absolute : {
-            address = Read16(PC + 1);
+            address = Read16(PC + uint16_t(1));
+            break;
         }
         case AbsoluteX: {
-            address = Read16(PC + 1) + uint8_t(X);
+            address = Read16(PC + uint16_t(1)) + uint8_t(X);
+            page_crossed = isPageDiffer(address - uint8_t(X), address);
+            break;
         }
         case AbsoluteY: {
-
-        }
-        case Accumulator: {
-
+            address = Read16(PC + uint16_t(1)) + uint8_t(Y);
+            page_crossed = isPageDiffer(address - uint8_t(Y), address);
+            break;
         }
         case Immediate: {
-
-        }
-        case Implied: {
-
+            address = PC + uint16_t(1);
+            break;
         }
         case IndexedIndirect: {
-
+            address = Read16Bug(Memory->Read(PC + uint16_t(1)) + uint16_t (X));
+            break;
         }
         case Indirect: {
-
+            address = Read16Bug(Read16(PC + uint16_t(1)));
+            break;
         }
         case IndirectIndexed: {
-
+            address = Read16Bug(Memory->Read(PC + uint16_t(1))) + uint16_t (Y);
+            page_crossed = isPageDiffer(address -uint16_t(Y), address);
         }
         case Relative: {
-
+            // TODO:
         }
         case ZeroPage: {
-
+            address = Memory->Read(PC + uint16_t(1));
+            break;
         }
         case ZeroPageX: {
-
+            // TODO:
         }
         case ZeroPageY: {
+            // TODO:
+        }
+        default: {}
+    }
 
-        }
-        default: {
-            PC += inst->InstructionSizes;
-            Cycles += inst->InstructionCycle;
-            if (page_crossed) {
-                Cycles += inst->PageCycle;
-            }
-        }
+    PC += inst->InstructionSizes;
+    Cycles += inst->InstructionCycle;
+    if (page_crossed) {
+        Cycles += inst->PageCycle;
     }
 
     inst->executor(this, address, PC, inst->AddressingMode == Accumulator);
