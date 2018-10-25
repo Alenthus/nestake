@@ -67,13 +67,28 @@ public:
     void irq();
     void nmi();
 
+    // memory push related
+    void push(uint8_t);
+    void push16(uint16_t);
+
+    // memory pull related
+    uint8_t pull();
+    uint16_t pull16();
+
     // memory related
-    uint16_t Read16(uint16_t);
-    uint16_t Read16Bug(uint16_t);
+    uint16_t read16(uint16_t);
+    uint16_t read16Bug(uint16_t);
+
+    // flag related
+    void setZ(uint8_t v);
+    void setN(uint8_t v);
+    void setZN(uint8_t v);
+    void compare(uint8_t a, uint8_t b);
+    void setFlags(uint8_t flag);
 };
 
 // interface of instruction executor
-typedef void (*InstructionExecutor) (NesCpu* cpu, uint16_t address, uint16_t pc, bool is_accumulator_mode);
+typedef void (*InstructionExecutor) (NesCpu* cpu, uint16_t address);
 
 // struct consisting of information for instruction execution
 struct InstructionParams {
