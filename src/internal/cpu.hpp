@@ -4,6 +4,7 @@
 #include <array>
 #include <map>
 #include "memory.hpp"
+
 namespace nestake {
     class Cpu {
     public:

@@ -71,6 +71,63 @@ namespace nestake {
         }
     }
 
+    void _bcc(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _bcs(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _beq(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _bit(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _bmi(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _bne(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _bql(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _brk(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _bvc(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _bvs(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _clc(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _cld(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _cli(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _clv(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _cmp(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _cpx(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _cpy(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _dec(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _dex(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _dey(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _eor(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _inc(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _inx(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _iny(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _jmp(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _jsr(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _lda(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _ldx(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _ldy(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _lsr(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _nop(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _ora(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _pha(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _php(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _pla(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _plp(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _rol(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _ror(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _rti(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _rts(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _sbc(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _sec(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _sed(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _sei(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _sta(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _stx(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _sty(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _tax(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void tay(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void tsx(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void txa(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void txs(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void tya(Cpu* cpu, uint16_t address, bool is_accumulator){};
+
+    // represents illegal operation
+    void illigal(Cpu* cpu, uint16_t address, bool is_accumulator){};
+
     // addressing mode
     enum AddressingMode {
         Absolute = 1, AbsoluteX, AbsoluteY, Accumulator, Immediate,
