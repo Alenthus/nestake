@@ -1,10 +1,12 @@
 #include <string>
+#include <iostream>
 #include "cpu.hpp"
 #include "memory.cpp"
 
 // Addressing mode struct for expressing each addressing mode as int
 
 using std::array;
+using std::cout;
 using std::map;
 using std::string;
 
@@ -20,7 +22,7 @@ namespace nestake {
         TAY, TSX, TXA, TXS, TYA, XAA,
     };
 
-    map<InstructionID, string> idToInstructionName = {
+    map<int, string> idToInstructionName = {
         {ADC, "ADC"}, {AHX, "AHX"}, {ALR, "ALR"}, {ANC, "ANC"}, {AND, "AND"}, {ARR, "ARR"}, {ASL, "ASL"}, {AXS, "AXS"}, {BCC, "BCC"}, {BCS, "BCS"}, {BEQ, "BEQ"}, {BIT, "BIT"}, {BMI, "BMI"}, {BNE, "BNE"}, {BPL, "BPL"}, {BRK, "BRK"},
         {BVC, "BVC"}, {BVS, "BVS"}, {CLC, "CLC"}, {CLD, "CLD"}, {CLI, "CLI"}, {CLV, "CLV"}, {CMP, "CMP"}, {CPX, "CPX"}, {CPY, "CPY"}, {DCP, "DCP"}, {DEC, "DEC"}, {DEX, "DEX"}, {DEY, "DEY"}, {EOR, "EOR"}, {INC, "INC"}, {INX, "INX"},
         {INY, "INY"}, {ISC, "ISC"}, {JMP, "JMP"}, {JSR, "JSR"}, {KIL, "KIL"}, {LAS, "LAS"}, {LAX, "LAX"}, {LDA, "LDA"}, {LDX, "LDX"}, {LDY, "LDY"}, {LSR, "LSR"}, {NOP, "NOP"}, {ORA, "ORA"}, {PHA, "PHA"}, {PHP, "PHP"}, {PLA, "PLA"},
@@ -119,11 +121,11 @@ namespace nestake {
     void _stx(Cpu* cpu, uint16_t address, bool is_accumulator){};
     void _sty(Cpu* cpu, uint16_t address, bool is_accumulator){};
     void _tax(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void tay(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void tsx(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void txa(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void txs(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void tya(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _tay(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _tsx(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _txa(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _txs(Cpu* cpu, uint16_t address, bool is_accumulator){};
+    void _tya(Cpu* cpu, uint16_t address, bool is_accumulator){};
 
     // represents illegal operation
     void illigal(Cpu* cpu, uint16_t address, bool is_accumulator){};
@@ -330,6 +332,13 @@ namespace nestake {
         }
 
         inst->executor(this, address, inst->AddressingMode == Accumulator);
+
+        if (IsDebugMode) {
+            cout << "[Instruction]:" << idToInstructionName.find(inst->ID)->second;
+            cout << "[address]: " << address;
+            cout << "[addressing mode]: " << inst->AddressingMode << "\n";
+        }
+
         return Cycles - prev_cycles;
     }
 }

@@ -8,6 +8,9 @@
 namespace nestake {
     class Cpu {
     public:
+        // debug flag
+        bool IsDebugMode;
+
         // pointer to NesMemory interface
         NesMemory* Memory;
 
