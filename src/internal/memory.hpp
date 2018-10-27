@@ -3,9 +3,11 @@
 
 #include <map>
 
-class NesMemory {
-public:
-    uint8_t Read(uint16_t address);
-    void Write(uint16_t address, uint8_t value);
-};
+namespace nestake {
+    class Memory {
+    public:
+        uint8_t Read(uint16_t address);
+        void Write(uint16_t address, uint8_t value);
+    };
+}
 #endif

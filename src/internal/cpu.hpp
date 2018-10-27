@@ -4,17 +4,43 @@
 #include <array>
 #include <functional>
 #include <map>
+#include <string>
 
 #include "memory.hpp"
 
 namespace nestake {
     class Cpu {
+    private:
+        // flag related
+        uint8_t getFlag();
+        void setZ(uint8_t v);
+        void setN(uint8_t v);
+        void setZN(uint8_t v);
+        void compare(uint8_t a, uint8_t b);
+        void setFlags(uint8_t flag);
+
+        // interruption related methods
+        void irq();
+        void nmi();
+
+        // memory push related
+        void push(uint8_t);
+        void push16(uint16_t);
+
+        // memory pull related
+        uint8_t pull();
+        uint16_t pull16();
+
+        // memory related
+        uint16_t read16(uint16_t);
+        uint16_t read16Bug(uint16_t);
+
     public:
         // debug flag
         bool IsDebugMode;
 
         // pointer to NesMemory interface
-        NesMemory* Memory;
+        Memory* Memory;
 
         // cpu cycles
         uint64_t Cycles;
@@ -59,10 +85,10 @@ namespace nestake {
         uint8_t N;
 
         // interrupt type to execute
-        uint8_t interrupt;
+        uint8_t Interrupt;
 
         // number of cycles to stall
-        int stall;
+        int Stall;
 
         // core method for executing instructions
         uint64_t Step();
@@ -70,28 +96,6 @@ namespace nestake {
         // interruption related methods
         void TriggerIRQ();
         void TriggerNMI();
-        void irq();
-        void nmi();
-
-        // memory push related
-        void push(uint8_t);
-        void push16(uint16_t);
-
-        // memory pull related
-        uint8_t pull();
-        uint16_t pull16();
-
-        // memory related
-        uint16_t read16(uint16_t);
-        uint16_t read16Bug(uint16_t);
-
-        // flag related
-        void setZ(uint8_t v);
-        void setN(uint8_t v);
-        void setZN(uint8_t v);
-        void compare(uint8_t a, uint8_t b);
-        void setFlags(uint8_t flag);
-        uint8_t getFlag();
 
         // instructions
         void _adc(uint16_t, bool);
@@ -175,5 +179,12 @@ namespace nestake {
 
         InstructionExecutor executor;
     };
+
+    // map of all instructions
+    std::map<uint8_t , InstructionParams> InstructionTable;
+    std::map<int, std::string> idToInstructionName;
+
+    // setup (instruction table)
+    void Setup();
 }
 #endif

@@ -4,9 +4,13 @@
 
 #include "memory.hpp"
 
-uint8_t NesMemory::Read(uint16_t address) {
-    // TODO: implement
-    return 0;
-}
+namespace nestake {
+    uint8_t Memory::Read(uint16_t address) {
+        // TODO: implement
+        return 0;
+    }
 
-void NesMemory::Write(uint16_t address, uint8_t value) {}
+    void Memory::Write(uint16_t address, uint8_t value) {
+        // TODO: implement
+    }
+}
