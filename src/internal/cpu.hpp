@@ -91,6 +91,7 @@ namespace nestake {
         void setZN(uint8_t v);
         void compare(uint8_t a, uint8_t b);
         void setFlags(uint8_t flag);
+        uint8_t getFlag();
 
         // instructions
         void _adc(uint16_t, bool);
