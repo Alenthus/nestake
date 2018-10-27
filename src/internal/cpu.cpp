@@ -858,16 +858,31 @@ namespace nestake {
 
 
     void Cpu::irq() {
-        // TODO: implement
+        push16(PC);
+        _php(0, false);
+        PC = read16(0xFFFE);
+        I = 1;
+        Cycles += 7;
     }
 
     void Cpu::nmi() {
-        // TODO: implement
+        push16(PC);
+        _php(0, false);
+        PC = read16(0xFFFA);
+        I = 1;
+        Cycles += 7;
     }
 
     // Array of instruction params to be selected by its corresponding bits.
-    array<InstructionParams, 256> InstructionTable = {
-            {0, 0, 0, 0, 0, execBRK}, // .... TODO: append instructions
+    map<uint8_t , InstructionParams> InstructionTable = {
+            {0x69, {ADC, Immediate, 2, 2, 0, execADC}},
+            {0x65, {ADC, ZeroPage, 2, 3, 0, execADC}},
+            {0x75, {ADC, ZeroPageX, 2, 4, 0, execADC}},
+            {0x6D, {ADC, Absolute, 3, 4, 0, execADC}},
+            {0x7D, {ADC, AbsoluteX, 3, 4, 1, execADC}},
+            {0x79, {ADC, AbsoluteY, 3, 4, 1, execADC}},
+            {0x79, {ADC, IndexedIndirect, 2, 6, 0, execADC}},
+            {0x79, {ADC, IndirectIndexed, 2, 5, 1, execADC}},
     };
 
 
@@ -895,7 +910,10 @@ namespace nestake {
         uint64_t prev_cycles = Cycles;
         uint16_t address = 0;
         bool page_crossed = false;
-        InstructionParams inst = InstructionTable[PC];
+
+        // read opcode
+        uint8_t op = Memory->Read(PC);
+        InstructionParams inst = InstructionTable[op];
 
         // switch the instruction's condition according to the addressing mode
         switch (inst.AddressingMode) {
