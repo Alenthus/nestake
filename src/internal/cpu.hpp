@@ -2,7 +2,9 @@
 #define NESTAKE_CPU
 
 #include <array>
+#include <functional>
 #include <map>
+
 #include "memory.hpp"
 
 namespace nestake {
@@ -89,10 +91,69 @@ namespace nestake {
         void setZN(uint8_t v);
         void compare(uint8_t a, uint8_t b);
         void setFlags(uint8_t flag);
+
+        // instructions
+        void _adc(uint16_t, bool);
+        void _and(uint16_t, bool);
+        void _asl(uint16_t, bool);
+        void _bcc(uint16_t, bool);
+        void _bcs(uint16_t, bool);
+        void _beq(uint16_t, bool);
+        void _bit(uint16_t, bool);
+        void _bmi(uint16_t, bool);
+        void _bne(uint16_t, bool);
+        void _bql(uint16_t, bool);
+        void _brk(uint16_t, bool);
+        void _bvc(uint16_t, bool);
+        void _bvs(uint16_t, bool);
+        void _clc(uint16_t, bool);
+        void _cld(uint16_t, bool);
+        void _cli(uint16_t, bool);
+        void _clv(uint16_t, bool);
+        void _cmp(uint16_t, bool);
+        void _cpx(uint16_t, bool);
+        void _cpy(uint16_t, bool);
+        void _dec(uint16_t, bool);
+        void _dex(uint16_t, bool);
+        void _dey(uint16_t, bool);
+        void _eor(uint16_t, bool);
+        void _inc(uint16_t, bool);
+        void _inx(uint16_t, bool);
+        void _iny(uint16_t, bool);
+        void _jmp(uint16_t, bool);
+        void _jsr(uint16_t, bool);
+        void _lda(uint16_t, bool);
+        void _ldx(uint16_t, bool);
+        void _ldy(uint16_t, bool);
+        void _lsr(uint16_t, bool);
+        void _nop(uint16_t, bool);
+        void _ora(uint16_t, bool);
+        void _pha(uint16_t, bool);
+        void _php(uint16_t, bool);
+        void _pla(uint16_t, bool);
+        void _plp(uint16_t, bool);
+        void _rol(uint16_t, bool);
+        void _ror(uint16_t, bool);
+        void _rti(uint16_t, bool);
+        void _rts(uint16_t, bool);
+        void _sbc(uint16_t, bool);
+        void _sec(uint16_t, bool);
+        void _sed(uint16_t, bool);
+        void _sei(uint16_t, bool);
+        void _sta(uint16_t, bool);
+        void _stx(uint16_t, bool);
+        void _sty(uint16_t, bool);
+        void _tax(uint16_t, bool);
+        void _tay(uint16_t, bool);
+        void _tsx(uint16_t, bool);
+        void _txa(uint16_t, bool);
+        void _txs(uint16_t, bool);
+        void _tya(uint16_t, bool);
+        void illegal(uint16_t, bool);
     };
 
     // interface of instruction executor
-    typedef void (*InstructionExecutor) (Cpu* cpu, uint16_t address, bool is_accumulator);
+    typedef void (*InstructionExecutor) (Cpu *cpu, uint16_t address, bool is_accumulator);
 
     // struct consisting of information for instruction execution
     struct InstructionParams {

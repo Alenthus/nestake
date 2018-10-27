@@ -1,9 +1,8 @@
-#include <string>
 #include <iostream>
+#include <string>
+
 #include "cpu.hpp"
 #include "memory.cpp"
-
-// Addressing mode struct for expressing each addressing mode as int
 
 using std::array;
 using std::cout;
@@ -11,125 +10,6 @@ using std::map;
 using std::string;
 
 namespace nestake {
-
-    // instructions's identifier supposed to be used in debugging
-    enum InstructionID {
-        ADC = 1, AHX, ALR, ANC, AND, ARR, ASL, AXS, BCC, BCS, BEQ, BIT, BMI,
-        BNE, BPL, BRK, BVC, BVS, CLC, CLD, CLI, CLV, CMP, CPX, CPY, DCP, DEC,
-        DEX, DEY, EOR, INC, INX, INY, ISC, JMP, JSR, KIL, LAS, LAX, LDA, LDX,
-        LDY, LSR, NOP, ORA, PHA, PHP, PLA, PLP, RLA, ROL, ROR, RRA, RTI, RTS,
-        SAX, SBC, SEC, SED, SEI, SHX, SHY, SLO, SRE, STA, STX, STY, TAS, TAX,
-        TAY, TSX, TXA, TXS, TYA, XAA,
-    };
-
-    map<int, string> idToInstructionName = {
-        {ADC, "ADC"}, {AHX, "AHX"}, {ALR, "ALR"}, {ANC, "ANC"}, {AND, "AND"}, {ARR, "ARR"}, {ASL, "ASL"}, {AXS, "AXS"}, {BCC, "BCC"}, {BCS, "BCS"}, {BEQ, "BEQ"}, {BIT, "BIT"}, {BMI, "BMI"}, {BNE, "BNE"}, {BPL, "BPL"}, {BRK, "BRK"},
-        {BVC, "BVC"}, {BVS, "BVS"}, {CLC, "CLC"}, {CLD, "CLD"}, {CLI, "CLI"}, {CLV, "CLV"}, {CMP, "CMP"}, {CPX, "CPX"}, {CPY, "CPY"}, {DCP, "DCP"}, {DEC, "DEC"}, {DEX, "DEX"}, {DEY, "DEY"}, {EOR, "EOR"}, {INC, "INC"}, {INX, "INX"},
-        {INY, "INY"}, {ISC, "ISC"}, {JMP, "JMP"}, {JSR, "JSR"}, {KIL, "KIL"}, {LAS, "LAS"}, {LAX, "LAX"}, {LDA, "LDA"}, {LDX, "LDX"}, {LDY, "LDY"}, {LSR, "LSR"}, {NOP, "NOP"}, {ORA, "ORA"}, {PHA, "PHA"}, {PHP, "PHP"}, {PLA, "PLA"},
-        {PLP, "PLP"}, {RLA, "RLA"}, {ROL, "ROL"}, {ROR, "ROR"}, {RRA, "RRA"}, {RTI, "RTI"}, {RTS, "RTS"}, {SAX, "SAX"}, {SBC, "SBC"}, {SEC, "SEC"}, {SED, "SED"}, {SEI, "SEI"}, {SHX, "SHX"}, {SHY, "SHY"}, {SLO, "SLO"}, {SRE, "SRE"},
-        {STA, "STA"}, {STX, "STX"}, {STY, "STY"}, {TAS, "TAS"}, {TAX, "TAX"}, {TAY, "TAY"}, {TSX, "TSX"}, {TXA, "TXA"}, {TXS, "TXS"}, {TYA, "TYA"}, {XAA, "XAA"}
-    };
-
-    void _adc(Cpu* cpu, uint16_t address){
-        uint8_t a = cpu->A;
-        uint8_t b = cpu->Memory->Read(address);
-        cpu->A = a + b + cpu->C;
-
-        // set Z & N flags
-        cpu->setZN(cpu->A);
-
-        // set carry flag
-        if ((int(a) + int(b) + int(cpu->C)) > 0xFF) {
-            cpu->C = 1;
-        } else {
-            cpu->C = 0;
-        }
-
-        // set overflow flag
-        if ((((a^b)&0x80) == 0) && (a^cpu->A != 0)){
-            cpu->V = 1;
-        } else {
-            cpu->V = 0;
-        }
-    }
-
-    void _and(Cpu* cpu, uint16_t address, bool is_accumulator){
-        cpu->A = cpu->A & cpu->Memory->Read(address);
-        // set Z & N flags
-        cpu->setZN(cpu->A);
-    }
-
-    void _asl(Cpu* cpu, uint16_t address, bool is_accumulator){
-        if (is_accumulator) {
-            cpu->C = (cpu->C >> 7) & uint8_t(1);
-            cpu->A <<= 1;
-            cpu->setZN(cpu->A);
-        } else {
-            uint8_t v = cpu->Memory->Read(address);
-            cpu->C = (v >> 7) & uint8_t(1);
-            v <<= 1;
-            cpu->Memory->Write(address, v);
-            cpu->setZN(v);
-        }
-    }
-
-    void _bcc(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _bcs(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _beq(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _bit(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _bmi(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _bne(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _bql(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _brk(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _bvc(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _bvs(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _clc(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _cld(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _cli(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _clv(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _cmp(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _cpx(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _cpy(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _dec(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _dex(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _dey(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _eor(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _inc(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _inx(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _iny(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _jmp(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _jsr(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _lda(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _ldx(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _ldy(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _lsr(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _nop(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _ora(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _pha(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _php(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _pla(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _plp(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _rol(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _ror(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _rti(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _rts(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _sbc(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _sec(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _sed(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _sei(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _sta(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _stx(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _sty(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _tax(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _tay(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _tsx(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _txa(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _txs(Cpu* cpu, uint16_t address, bool is_accumulator){};
-    void _tya(Cpu* cpu, uint16_t address, bool is_accumulator){};
-
-    // represents illegal operation
-    void illigal(Cpu* cpu, uint16_t address, bool is_accumulator){};
-
     // addressing mode
     enum AddressingMode {
         Absolute = 1, AbsoluteX, AbsoluteY, Accumulator, Immediate,
@@ -142,9 +22,449 @@ namespace nestake {
         interruptNone = 1, interruptNMI, interruptIRQ,
     };
 
-    bool isPageDiffer(uint16_t a, uint16_t b) {
+    // instructions's identifier supposed to be used in debugging
+    enum InstructionID {
+        ADC = 1, AHX, ALR, ANC, AND, ARR, ASL, AXS, BCC, BCS, BEQ, BIT, BMI,
+        BNE, BPL, BRK, BVC, BVS, CLC, CLD, CLI, CLV, CMP, CPX, CPY, DCP, DEC,
+        DEX, DEY, EOR, INC, INX, INY, ISC, JMP, JSR, KIL, LAS, LAX, LDA, LDX,
+        LDY, LSR, NOP, ORA, PHA, PHP, PLA, PLP, RLA, ROL, ROR, RRA, RTI, RTS,
+        SAX, SBC, SEC, SED, SEI, SHX, SHY, SLO, SRE, STA, STX, STY, TAS, TAX,
+        TAY, TSX, TXA, TXS, TYA, XAA,
+    };
+
+    // debugging purpose
+    map<int, string> idToInstructionName = {
+        {ADC, "ADC"}, {AHX, "AHX"}, {ALR, "ALR"}, {ANC, "ANC"}, {AND, "AND"}, {ARR, "ARR"}, {ASL, "ASL"}, {AXS, "AXS"}, {BCC, "BCC"}, {BCS, "BCS"}, {BEQ, "BEQ"}, {BIT, "BIT"}, {BMI, "BMI"}, {BNE, "BNE"}, {BPL, "BPL"}, {BRK, "BRK"},
+        {BVC, "BVC"}, {BVS, "BVS"}, {CLC, "CLC"}, {CLD, "CLD"}, {CLI, "CLI"}, {CLV, "CLV"}, {CMP, "CMP"}, {CPX, "CPX"}, {CPY, "CPY"}, {DCP, "DCP"}, {DEC, "DEC"}, {DEX, "DEX"}, {DEY, "DEY"}, {EOR, "EOR"}, {INC, "INC"}, {INX, "INX"},
+        {INY, "INY"}, {ISC, "ISC"}, {JMP, "JMP"}, {JSR, "JSR"}, {KIL, "KIL"}, {LAS, "LAS"}, {LAX, "LAX"}, {LDA, "LDA"}, {LDX, "LDX"}, {LDY, "LDY"}, {LSR, "LSR"}, {NOP, "NOP"}, {ORA, "ORA"}, {PHA, "PHA"}, {PHP, "PHP"}, {PLA, "PLA"},
+        {PLP, "PLP"}, {RLA, "RLA"}, {ROL, "ROL"}, {ROR, "ROR"}, {RRA, "RRA"}, {RTI, "RTI"}, {RTS, "RTS"}, {SAX, "SAX"}, {SBC, "SBC"}, {SEC, "SEC"}, {SED, "SED"}, {SEI, "SEI"}, {SHX, "SHX"}, {SHY, "SHY"}, {SLO, "SLO"}, {SRE, "SRE"},
+        {STA, "STA"}, {STX, "STX"}, {STY, "STY"}, {TAS, "TAS"}, {TAX, "TAX"}, {TAY, "TAY"}, {TSX, "TSX"}, {TXA, "TXA"}, {TXS, "TXS"}, {TYA, "TYA"}, {XAA, "XAA"}
+    };
+
+    bool isPageCrossed(uint16_t a, uint16_t b) {
         return (a&0xFF00) == (b&0xFF00);
     }
+
+    // ADC instruction
+    void Cpu::_adc(uint16_t address, bool is_accumulator){
+        uint8_t a = A;
+        uint8_t b = Memory->Read(address);
+        A = a + b + C;
+
+        // set Z & N flags
+        setZN(A);
+
+        // set carry flag
+        if ((int(a) + int(b) + int(C)) > 0xFF) {
+            C = 1;
+        } else {
+            C = 0;
+        }
+
+        // set overflow flag
+        if ((((a^b)&0x80) == 0) && (((a^A)&0x80) != 0)){
+            V = 1;
+        } else {
+            V = 0;
+        }
+    }
+
+    void execADC(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_adc(address, is_accumulator);
+    }
+
+
+    // AND instruction
+    void Cpu::_and(uint16_t address, bool is_accumulator){
+        A = A & Memory->Read(address);
+        // set Z & N flags
+        setZN(A);
+    }
+
+    void execAND(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_and(address, is_accumulator);
+    }
+
+
+    // ASL instruction
+    void Cpu::_asl(uint16_t address, bool is_accumulator){
+        if (is_accumulator) {
+            C = (C >> 7) & uint8_t(1);
+            A <<= 1;
+            setZN(A);
+        } else {
+            uint8_t v = Memory->Read(address);
+            C = (v >> 7) & uint8_t(1);
+            v <<= 1;
+            Memory->Write(address, v);
+            setZN(v);
+        }
+    }
+
+    void execASL(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_asl(address, is_accumulator);
+    }
+
+
+    // BCC instruction
+    void Cpu::_bcc(uint16_t address, bool is_accumulator){
+        if (C == 0) {
+            if (isPageCrossed(PC, address)) {
+                ++Cycles;
+            }
+            ++Cycles;
+            PC = address;
+        };
+    };
+
+    void execBCC(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_bcc(address, is_accumulator);
+    }
+
+
+    // BCS instruction
+    void Cpu::_bcs(uint16_t address, bool is_accumulator){
+        if (C != 0) {
+            if (isPageCrossed(PC, address)) {
+                ++Cycles;
+            }
+            ++Cycles;
+            PC = address;
+        }
+    };
+
+    void execBCS(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_bcs(address, is_accumulator);
+    }
+
+
+    // BEQ instruction
+    void Cpu::_beq(uint16_t address, bool is_accumulator){
+        if (Z != 0) {
+            if (isPageCrossed(PC, address)) {
+                ++Cycles;
+            }
+            ++Cycles;
+            PC = address;
+        }
+    };
+
+    void execBEQ(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_bcs(address, is_accumulator);
+    }
+
+
+    // BIT operation
+    void Cpu::_bit(uint16_t address, bool is_accumulator){
+        uint8_t v = Memory->Read(address);
+        V = (v >> 6) & uint8_t(1);
+        setZ(v & A);
+        setN(v);
+    };
+
+    void execBIT(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_bit(address, is_accumulator);
+    }
+
+
+    // BMI params
+    void Cpu::_bmi(uint16_t address, bool is_accumulator){
+        if (N != 0){
+            if (isPageCrossed(PC, address)) {
+                ++Cycles;
+            }
+            ++Cycles;
+            PC = address;
+        }
+    };
+
+    void execBMI(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_bmi(address, is_accumulator);
+    }
+
+
+    // BNE operation
+    void Cpu::_bne(uint16_t address, bool is_accumulator){
+        if (Z == 0) {
+            if (isPageCrossed(PC, address)) {
+                ++Cycles;
+            }
+            ++Cycles;
+            PC = address;
+        }
+    };
+
+    void execBNE(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_bne(address, is_accumulator);
+    }
+
+
+    // BQL operation
+    void Cpu::_bql(uint16_t address, bool is_accumulator){
+        if (N == 0) {
+            if (isPageCrossed(PC, address)) {
+                ++Cycles;
+            }
+            ++Cycles;
+            PC = address;
+        }
+    };
+
+    void execBQL(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_bql(address, is_accumulator);
+    }
+
+
+    // BRK instruction
+    void Cpu::_brk(uint16_t address, bool is_accumulator){
+        push16(PC);
+        _php(address, is_accumulator);
+        _sei(address, is_accumulator);
+        PC = read16(0xFFFE);
+    };
+
+    void execBRK(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_brk(address, is_accumulator);
+    }
+
+
+    // BVC instruction
+    void Cpu::_bvc(uint16_t address, bool is_accumulator){
+        if (V == 0) {
+            if (isPageCrossed(PC, address)) {
+                ++Cycles;
+            }
+            ++Cycles;
+            PC = address;
+        }
+    };
+
+    void execBVC(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_brk(address, is_accumulator);
+    }
+
+
+    // BVS instruction
+    void Cpu::_bvs(uint16_t address, bool is_accumulator){
+        if (V != 0) {
+            if (isPageCrossed(PC, address)) {
+                ++Cycles;
+            }
+            ++Cycles;
+            PC = address;
+        }
+    };
+
+    void execBVS(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_bvs(address, is_accumulator);
+    }
+
+
+    // CLC instruction
+    void Cpu::_clc(uint16_t address, bool is_accumulator){
+        C = 0;
+    };
+
+    void execCLC(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_clc(address, is_accumulator);
+    }
+
+
+    // CLD instruction
+    void Cpu::_cld(uint16_t address, bool is_accumulator){
+        D = 0;
+    };
+
+    void execCLD(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_cld(address, is_accumulator);
+    }
+
+
+    // CLI instruction
+    void Cpu::_cli(uint16_t address, bool is_accumulator){
+        I = 0;
+    };
+
+    void execCLI(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_cli(address, is_accumulator);
+    }
+
+
+    // CLV instruction
+    void Cpu::_clv(uint16_t address, bool is_accumulator){
+        V = 0;
+    };
+
+    void execCLV(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_clv(address, is_accumulator);
+    }
+
+
+    // CMP instruction
+    void Cpu::_cmp(uint16_t address, bool is_accumulator){
+        uint8_t v = Memory->Read(address);
+        compare(A, v);
+    };
+
+    void execCMP(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_cmp(address, is_accumulator);
+    }
+
+
+    void Cpu::_cpx(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_cpy(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_dec(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_dex(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_dey(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_eor(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_inc(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_inx(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_iny(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_jmp(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_jsr(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_lda(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_ldx(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_ldy(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_lsr(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_nop(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_ora(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_pha(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_php(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_pla(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_plp(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_rol(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_ror(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_rti(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_rts(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_sbc(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_sec(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_sed(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_sei(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_sta(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_stx(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_sty(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_tax(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_tay(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_tsx(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_txa(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_txs(uint16_t address, bool is_accumulator){
+
+    };
+
+    void Cpu::_tya(uint16_t address, bool is_accumulator){
+
+    };
+
+    // represents illegal operation ... DO NOTHING
+    void Cpu::illegal(uint16_t address, bool is_accumulator){};
 
     uint16_t Cpu::read16(uint16_t address) {
         uint16_t lo = Memory->Read(address);
@@ -239,7 +559,10 @@ namespace nestake {
     }
 
     // Array of instruction params to be selected by its corresponding bits.
-    array<InstructionParams*, 256> InstructionTable = {};
+    array<InstructionParams, 256> InstructionTable = {
+            {0, 0, 0, 0, 0, execBRK}, // .... TODO: append instructions
+    };
+
 
     uint64_t Cpu::Step() {
 
@@ -276,12 +599,12 @@ namespace nestake {
             }
             case AbsoluteX: {
                 address = read16(PC + uint16_t(1)) + uint8_t(X);
-                page_crossed = isPageDiffer(address - uint8_t(X), address);
+                page_crossed = isPageCrossed(address - uint8_t(X), address);
                 break;
             }
             case AbsoluteY: {
                 address = read16(PC + uint16_t(1)) + uint8_t(Y);
-                page_crossed = isPageDiffer(address - uint8_t(Y), address);
+                page_crossed = isPageCrossed(address - uint8_t(Y), address);
                 break;
             }
             case Immediate: {
@@ -298,7 +621,7 @@ namespace nestake {
             }
             case IndirectIndexed: {
                 address = read16Bug(Memory->Read(PC + uint16_t(1))) + uint16_t(Y);
-                page_crossed = isPageDiffer(address - uint16_t(Y), address);
+                page_crossed = isPageCrossed(address - uint16_t(Y), address);
             }
             case Relative: {
                 uint16_t offset = Memory->Read(PC + uint16_t(1));
