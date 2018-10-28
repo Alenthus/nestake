@@ -84,8 +84,79 @@ TEST(CPUTest, PULL16) {
     EXPECT_EQ(0x9896, actual);
 }
 
+TEST(CPUTest, GetFlag) {
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.C = 1;
+    cpu.Z = 0;
+    cpu.I = 0;
+    cpu.D = 1;
+    cpu.B = 0;
+    cpu.U = 0;
+    cpu.V = 0;
+    cpu.N = 1;
+    uint8_t actual = cpu.getFlag();
+    EXPECT_EQ(0b10001001, actual);
+}
+
+
+TEST(CPUTest, SetFlags) {
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.setFlags(0b10001001);
+    EXPECT_EQ(1, cpu.C);
+    EXPECT_EQ(0, cpu.Z);
+    EXPECT_EQ(0, cpu.I);
+    EXPECT_EQ(1, cpu.D);
+    EXPECT_EQ(0, cpu.B);
+    EXPECT_EQ(0, cpu.U);
+    EXPECT_EQ(0, cpu.V);
+    EXPECT_EQ(1, cpu.N);
+}
+
 TEST(CPUTest, ADC) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+
+    // Neither overflow nor carry case
+    cpu.A = 0;
+    cpu.C = 0;
+    mem.RAM[0x0000] = 1;
+    cpu._adc(0x0000, false);
+
+    EXPECT_EQ(1, cpu.A);
+    EXPECT_EQ(0, cpu.Z);
+    EXPECT_EQ(1, cpu.N);
+
+    // NOT overflow BUT carry
+    cpu.A = 1;
+    cpu.C = 0;
+    mem.RAM[0x0000] = 0xFF;
+    cpu._adc(0x0000, false);
+
+    EXPECT_EQ(0x00, cpu.A);
+    EXPECT_EQ(1, cpu.C);
+    EXPECT_EQ(0, cpu.V);
+
+    // NOT carry BUT overflow
+    cpu.A = 0b01000000;
+    cpu.C = 0;
+    mem.RAM[0x0000] = 0b01000000;
+    cpu._adc(0x0000, false);
+
+    EXPECT_EQ(0b10000000, cpu.A);
+    EXPECT_EQ(0, cpu.C);
+    EXPECT_EQ(1, cpu.V);
+
+    // overflow AND carry
+    cpu.A = 0b10000000;
+    cpu.C = 0;
+    mem.RAM[0x0000] = 0b10000000;
+    cpu._adc(0x0000, false);
+
+    EXPECT_EQ(0, cpu.A);
+    EXPECT_EQ(1, cpu.C);
+    EXPECT_EQ(1, cpu.V);
 }
 
 TEST(CPUTest, AND) {

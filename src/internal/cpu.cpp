@@ -803,7 +803,7 @@ namespace nestake {
     }
 
     void Cpu::setFlags(uint8_t flag) {
-        C = (flag >> 0) & uint8_t(1);
+        C = flag & uint8_t(1);
         Z = (flag >> 1) & uint8_t(1);
         I = (flag >> 2) & uint8_t(1);
         D = (flag >> 3) & uint8_t(1);
@@ -815,8 +815,7 @@ namespace nestake {
 
 
     uint8_t Cpu::getFlag() {
-        uint8_t flag = 0;
-        flag |= C << 0;
+        uint8_t flag = C;
         flag |= Z << 1;
         flag |= I << 2;
         flag |= D << 3;
