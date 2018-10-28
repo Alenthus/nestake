@@ -107,7 +107,7 @@ namespace nestake {
         void _bit(uint16_t, bool);
         void _bmi(uint16_t, bool);
         void _bne(uint16_t, bool);
-        void _bql(uint16_t, bool);
+        void _bpl(uint16_t, bool);
         void _brk(uint16_t, bool);
         void _bvc(uint16_t, bool);
         void _bvs(uint16_t, bool);
@@ -154,7 +154,6 @@ namespace nestake {
         void _txa(uint16_t, bool);
         void _txs(uint16_t, bool);
         void _tya(uint16_t, bool);
-        void illegal(uint16_t, bool);
     };
 
     // interface of instruction executor

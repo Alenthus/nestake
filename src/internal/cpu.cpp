@@ -190,8 +190,8 @@ namespace nestake {
     }
 
 
-    // BQL operation
-    void Cpu::_bql(uint16_t address, bool is_accumulator){
+    // BPL operation
+    void Cpu::_bpl(uint16_t address, bool is_accumulator){
         if (N == 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -201,8 +201,8 @@ namespace nestake {
         }
     };
 
-    void execBQL(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bql(address, is_accumulator);
+    void execBPL(Cpu *cpu, uint16_t address, bool is_accumulator) {
+        cpu->_bpl(address, is_accumulator);
     }
 
 
@@ -659,7 +659,7 @@ namespace nestake {
         Memory->Write(address, A);
     };
 
-    void execSEA(Cpu *cpu, uint16_t address, bool is_accumulator) {
+    void execSTA(Cpu *cpu, uint16_t address, bool is_accumulator) {
         cpu->_sta(address, is_accumulator);
     }
 
@@ -669,7 +669,7 @@ namespace nestake {
         Memory->Write(address, X);
     };
 
-    void execSEX(Cpu *cpu, uint16_t address, bool is_accumulator) {
+    void execSTX(Cpu *cpu, uint16_t address, bool is_accumulator) {
         cpu->_stx(address, is_accumulator);
     }
 
@@ -746,9 +746,6 @@ namespace nestake {
     void execTYA(Cpu *cpu, uint16_t address, bool is_accumulator) {
         cpu->_tya(address, is_accumulator);
     }
-
-    // represents illegal operation ... DO NOTHING
-    void Cpu::illegal(uint16_t address, bool is_accumulator){};
 
     uint16_t Cpu::read16(uint16_t address) {
         uint16_t lo = Memory->Read(address);
@@ -970,34 +967,166 @@ namespace nestake {
 
     void Setup() {
         // setup instruction table
-        nestake::InstructionTable = {
-                // ADC instructions
-                {0x69, {ADC, Immediate, 2, 2, 0, execADC}}, {0x65, {ADC, ZeroPage, 2, 3, 0, execADC}},
-                {0x75, {ADC, ZeroPageX, 2, 4, 0, execADC}}, {0x6D, {ADC, Absolute, 3, 4, 0, execADC}},
-                {0x7D, {ADC, AbsoluteX, 3, 4, 1, execADC}}, {0x79, {ADC, AbsoluteY, 3, 4, 1, execADC}},
-                {0x79, {ADC, IndexedIndirect, 2, 6, 0, execADC}}, {0x79, {ADC, IndirectIndexed, 2, 5, 1, execADC}},
+        // ref: http://pgate1.at-ninja.jp/NES_on_FPGA/nes_cpu.htm#instruction
+        InstructionTable = {
+            // ADC
+            {0x69, {ADC, Immediate, 2, 2, 0, execADC}}, {0x65, {ADC, ZeroPage, 2, 3, 0, execADC}},
+            {0x75, {ADC, ZeroPageX, 2, 4, 0, execADC}}, {0x6D, {ADC, Absolute, 3, 4, 0, execADC}},
+            {0x7D, {ADC, AbsoluteX, 3, 4, 1, execADC}}, {0x79, {ADC, AbsoluteY, 3, 4, 1, execADC}},
+            {0x79, {ADC, IndexedIndirect, 2, 6, 0, execADC}}, {0x71, {ADC, IndirectIndexed, 2, 5, 1, execADC}},
 
+            // SBC
+            {0xE9, {SBC, Immediate, 2, 2, 0, execSBC}}, {0xE5, {SBC, ZeroPage, 2, 3, 0, execSBC}},
+            {0xF5, {SBC, ZeroPageX, 2, 4, 0, execSBC}}, {0xED, {SBC, Absolute, 3, 4, 0, execSBC}},
+            {0xFD, {SBC, AbsoluteX, 3, 4, 1, execSBC}}, {0xF9, {SBC, AbsoluteY, 3, 4, 1, execSBC}},
+            {0xE1, {SBC, IndexedIndirect, 2, 6, 0, execSBC}}, {0xF1, {SBC, IndirectIndexed, 2, 5, 1, execSBC}},
 
-                // TODO add more instructions
+            // AND
+            {0x29, {AND, Immediate, 2, 2, 0, execAND}}, {0x25, {AND, ZeroPage, 2, 3, 0, execAND}},
+            {0x35, {AND, ZeroPageX, 2, 4, 0, execAND}}, {0x2D, {AND, Absolute, 3, 4, 0, execAND}},
+            {0x3D, {AND, AbsoluteX, 3, 4, 1, execAND}}, {0x39, {AND, AbsoluteY, 3, 4, 1, execAND}},
+            {0x21, {AND, IndexedIndirect, 2, 6, 0, execAND}}, {0x31, {AND, IndirectIndexed, 2, 5, 1, execAND}},
+
+            // ORA
+            {0x09, {ORA, Immediate, 2, 2, 0, execORA}}, {0x05, {ORA, ZeroPage, 2, 3, 0, execORA}},
+            {0x15, {ORA, ZeroPageX, 2, 4, 0, execORA}}, {0x0D, {ORA, Absolute, 3, 4, 0, execORA}},
+            {0x1D, {ORA, AbsoluteX, 3, 4, 1, execORA}}, {0x19, {ORA, AbsoluteY, 3, 4, 1, execORA}},
+            {0x01, {ORA, IndexedIndirect, 2, 6, 0, execORA}}, {0x11, {ORA, IndirectIndexed, 2, 5, 1, execORA}},
+
+            // EOR
+            {0x49, {EOR, Immediate, 2, 2, 0, execEOR}}, {0x45, {EOR, ZeroPage, 2, 3, 0, execEOR}},
+            {0x55, {EOR, ZeroPageX, 2, 4, 0, execEOR}}, {0x4D, {EOR, Absolute, 3, 4, 0, execEOR}},
+            {0x5D, {EOR, AbsoluteX, 3, 4, 1, execEOR}}, {0x59, {EOR, AbsoluteY, 3, 4, 1, execEOR}},
+            {0x41, {EOR, IndexedIndirect, 2, 6, 0, execEOR}}, {0x51, {EOR, IndirectIndexed, 2, 5, 1, execEOR}},
+
+            // ASL
+            {0x0A, {ASL, Accumulator, 1, 2, 0, execASL}}, {0x06, {ASL, ZeroPage, 2, 5, 0, execASL}},
+            {0x16, {ASL, ZeroPageX, 2, 6, 0, execASL}}, {0x0E, {ASL, Absolute, 3, 6, 0, execASL}},
+            {0x1E, {ASL, AbsoluteX, 3, 6, 1, execASL}},
+
+            // LSR
+            {0x4A, {LSR, Accumulator, 1, 2, 0, execLSR}}, {0x46, {LSR, ZeroPage, 2, 5, 0, execLSR}},
+            {0x56, {LSR, ZeroPageX, 2, 6, 0, execLSR}}, {0x4E, {LSR, Absolute, 3, 6, 0, execLSR}},
+            {0x5E, {LSR, AbsoluteX, 3, 6, 1, execLSR}},
+
+            // ROL
+            {0x2A, {ROL, Accumulator, 1, 2, 0, execROL}}, {0x26, {ROL, ZeroPage, 2, 5, 0, execROL}},
+            {0x36, {ROL, ZeroPageX, 2, 6, 0, execROL}}, {0x2E, {ROL, Absolute, 3, 6, 0, execROL}},
+            {0x3E, {ROL, AbsoluteX, 3, 6, 1, execROL}},
+
+            // ROR
+            {0x6A, {ROR, Accumulator, 1, 2, 0, execROR}}, {0x66, {ROR, ZeroPage, 2, 5, 0, execROR}},
+            {0x76, {ROR, ZeroPageX, 2, 6, 0, execROR}}, {0x6E, {ROR, Absolute, 3, 6, 0, execROR}},
+            {0x7E, {ROR, AbsoluteX, 3, 6, 1, execROR}},
+
+            // Relatives
+            {0x90, {BCC, Relative, 2, 2, 1, execBCC}}, {0xB0, {BCS, Relative, 2, 2, 1, execBCS}},
+            {0xF0, {BEQ, Relative, 2, 2, 1, execBEQ}}, {0xD0, {BNE, Relative, 2, 2, 1, execBNE}},
+            {0x50, {BVC, Relative, 2, 2, 1, execBVC}}, {0x70, {BVS, Relative, 2, 2, 1, execBVS}},
+            {0x10, {BPL, Relative, 2, 2, 1, execBPL}}, {0x30, {BMI, Relative, 2, 2, 1, execBMI}},
+
+            // BIT
+            {0x24, {BIT, ZeroPage, 2, 3, 0, execBIT}}, {0x2C, {BIT, Absolute, 3, 4, 0, execBIT}},
+
+            // JMP
+            {0x4C, {JMP, Absolute, 3, 3, 0, execJMP}}, {0x6C, {JMP, Indirect, 3, 5, 0, execJMP}},
+
+            // JSR / RTS / BRK / RTI
+            {0x20, {JSR, Absolute, 3, 6, 0, execJSR}}, {0x60, {RTS, Implied, 1, 6, 0, execRTS}},
+            {0x00, {BRK, Implied, 1, 7, 0, execBRK}}, {0x40, {RTI, Implied, 1, 6, 0, execRTI}},
+
+            // CMP
+            {0xC9, {CMP, Immediate, 2, 2, 0, execCMP}}, {0xC5, {CMP, ZeroPage, 2, 3, 0, execCMP}},
+            {0xD5, {CMP, ZeroPageX, 2, 4, 0, execCMP}}, {0xCD, {CMP, Absolute, 3, 4, 0, execCMP}},
+            {0xDD, {CMP, AbsoluteX, 3, 4, 1, execCMP}}, {0xD9, {CMP, AbsoluteY, 3, 4, 1, execCMP}},
+            {0xC1, {CMP, IndexedIndirect, 2, 6, 0, execCMP}}, {0xD1, {CMP, IndirectIndexed, 2, 5, 1, execCMP}},
+
+            // CPX
+            {0xE0, {CPX, Immediate, 2, 2, 0, execCPX}}, {0xE4, {CPX, ZeroPage, 2, 3, 0, execCPX}},
+            {0xEC, {CPX, Absolute, 3, 4, 0, execCPX}},
+
+            // CPY
+            {0xC0, {CPY, Immediate, 2, 2, 0, execCPY}}, {0xC4, {CPX, ZeroPage, 2, 3, 0, execCPY}},
+            {0xCC, {CPY, Absolute, 3, 4, 0, execCPY}},
+
+            // INC
+            {0xE6, {INC, ZeroPage, 2, 5, 0, execINC}}, {0xF6, {INC, ZeroPageX, 2, 6, 0, execINC}},
+            {0xEE, {INC, Absolute, 3, 6, 0, execINC}}, {0xFE, {INC, AbsoluteX, 3, 6, 1, execINC}},
+
+            // DEC
+            {0xC6, {DEC, ZeroPage, 2, 5, 0, execDEC}}, {0xD6, {DEC, ZeroPageX, 2, 6, 0, execDEC}},
+            {0xCE, {DEC, Absolute, 3, 6, 0, execDEC}}, {0xDE, {DEC, AbsoluteX, 3, 6, 1, execDEC}},
+
+            // DE{X,Y} / IN{X,Y}
+            {0xE8, {INX, Implied, 1, 2, 0, execINX}}, {0xCA, {DEX, Implied, 1, 2, 0, execDEX}},
+            {0xC8, {INY, Implied, 1, 2, 0, execINY}}, {0x88, {DEY, Implied, 1, 2, 0, execDEY}},
+
+            // CL{C,I,D,V} / SE{C, I, D}
+            {0x18, {CLC, Implied, 1, 2, 0, execCLC}}, {0x38, {SEC, Implied, 1, 2, 0, execSEC}},
+            {0x58, {CLI, Implied, 1, 2, 0, execCLI}}, {0x78, {SEI, Implied, 1, 2, 0, execSEI}},
+            {0xD8, {CLD, Implied, 1, 2, 0, execCLD}}, {0xF8, {SED, Implied, 1, 2, 0, execSED}},
+            {0xB8, {CLV, Implied, 1, 2, 0, execCLV}},
+
+            // LDA
+            {0xA9, {LDA, Immediate, 2, 2, 0, execLDA}}, {0xA5, {LDA, ZeroPage, 2, 3, 0, execLDA}},
+            {0xB5, {LDA, ZeroPageX, 2, 4, 0, execLDA}}, {0xAD, {LDA, Absolute, 3, 4, 0, execLDA}},
+            {0xBD, {LDA, AbsoluteX, 3, 4, 1, execLDA}}, {0xB9, {LDA, AbsoluteY, 3, 4, 1, execLDA}},
+            {0xA9, {LDA, IndexedIndirect, 2, 6, 0, execLDA}}, {0xB1, {LDA, IndirectIndexed, 2, 5, 1, execLDA}},
+
+            // LDX
+            {0xA2, {LDX, Immediate, 2, 2, 0, execLDX}}, {0xA6, {LDX, ZeroPage, 2, 3, 0, execLDX}},
+            {0xB6, {LDX, ZeroPageY, 2, 4, 0, execLDX}}, {0xAE, {LDX, Absolute, 3, 4, 0, execLDX}},
+            {0xBE, {LDX, AbsoluteY, 3, 4, 1, execLDX}},
+
+            // LDY
+            {0xA0, {LDY, Immediate, 2, 2, 0, execLDY}}, {0xA4, {LDY, ZeroPage, 2, 3, 0, execLDY}},
+            {0xB4, {LDY, ZeroPageX, 2, 4, 0, execLDY}}, {0xAC, {LDY, Absolute, 3, 4, 0, execLDY}},
+            {0xBC, {LDY, AbsoluteX, 3, 4, 1, execLDY}},
+
+            // STA
+            {0x85, {STA, ZeroPage, 2, 3, 0, execSTA}}, {0x95, {LDA, ZeroPageX, 2, 4, 0, execSTA}},
+            {0x8D, {STA, Absolute, 3, 4, 0, execSTA}}, {0x9D, {LDA, AbsoluteX, 3, 4, 1, execSTA}},
+            {0x99, {STA, AbsoluteY, 3, 4, 1, execSTA}}, {0x81, {LDA, IndexedIndirect, 2, 6,01, execSTA}},
+            {0x91, {STA, IndirectIndexed, 2, 5, 1, execSTA}},
+
+            // STX
+            {0x86, {STX, ZeroPage, 2, 3, 0, execSTX}}, {0x96, {STX, ZeroPageX, 2, 4, 0, execSTX}},
+            {0x8E, {STX, Absolute, 3, 4, 0, execSTX}},
+
+            // STY
+            {0x84, {STX, ZeroPage, 2, 3, 0, execSTX}}, {0x94, {STX, ZeroPageX, 2, 4, 0, execSTX}},
+            {0x8C, {STX, Absolute, 3, 4, 0, execSTX}},
+
+            // transfer related
+            {0xAA, {TAX, Implied, 1, 2, 0, execTAX}}, {0x8A, {TXA, Implied, 1, 2, 0, execTXA}},
+            {0xA8, {TAY, Implied, 1, 2, 0, execTAY}}, {0x98, {TYA, Implied, 1, 2, 0, execTYA}},
+            {0x9A, {TXS, Implied, 1, 2, 0, execTXS}}, {0xBA, {TSX, Implied, 1, 2, 0, execTSX}},
+
+            // push related
+            {0x48, {PHA, Implied, 1, 3, 0, execPHA}}, {0x68, {PLA, Implied, 1, 4, 0, execPLA}},
+            {0x08, {PHP, Implied, 1, 3, 0, execPHP}}, {0x28, {PLP, Implied, 1, 4, 0, execPLP}},
+
+            // NOP
+            {0xEA, {NOP, Implied, 1, 2, 0, execNOP}}
         };
 
         // debugging purpose
         idToInstructionName = {
-                {ADC, "ADC"}, {AHX, "AHX"}, {ALR, "ALR"}, {ANC, "ANC"}, {AND, "AND"},
-                {ARR, "ARR"}, {ASL, "ASL"}, {AXS, "AXS"}, {BCC, "BCC"}, {BCS, "BCS"},
-                {BEQ, "BEQ"}, {BIT, "BIT"}, {BMI, "BMI"}, {BNE, "BNE"}, {BPL, "BPL"},
-                {BRK, "BRK"}, {BVC, "BVC"}, {BVS, "BVS"}, {CLC, "CLC"}, {CLD, "CLD"},
-                {CLI, "CLI"}, {CLV, "CLV"}, {CMP, "CMP"}, {CPX, "CPX"}, {CPY, "CPY"},
-                {DCP, "DCP"}, {DEC, "DEC"}, {DEX, "DEX"}, {DEY, "DEY"}, {EOR, "EOR"},
-                {INC, "INC"}, {INX, "INX"}, {INY, "INY"}, {ISC, "ISC"}, {JMP, "JMP"},
-                {JSR, "JSR"}, {KIL, "KIL"}, {LAS, "LAS"}, {LAX, "LAX"}, {LDA, "LDA"},
-                {LDX, "LDX"}, {LDY, "LDY"}, {LSR, "LSR"}, {NOP, "NOP"}, {ORA, "ORA"},
-                {PHA, "PHA"}, {PHP, "PHP"}, {PLA, "PLA"}, {PLP, "PLP"}, {RLA, "RLA"},
-                {ROL, "ROL"}, {ROR, "ROR"}, {RRA, "RRA"}, {RTI, "RTI"}, {RTS, "RTS"},
-                {SAX, "SAX"}, {SBC, "SBC"}, {SEC, "SEC"}, {SED, "SED"}, {SEI, "SEI"},
-                {SHX, "SHX"}, {SHY, "SHY"}, {SLO, "SLO"}, {SRE, "SRE"}, {STA, "STA"},
-                {STX, "STX"}, {STY, "STY"}, {TAS, "TAS"}, {TAX, "TAX"}, {TAY, "TAY"},
-                {TSX, "TSX"}, {TXA, "TXA"}, {TXS, "TXS"}, {TYA, "TYA"}, {XAA, "XAA"}
+            {ADC, "ADC"}, {AHX, "AHX"}, {ALR, "ALR"}, {ANC, "ANC"}, {AND, "AND"},
+            {ARR, "ARR"}, {ASL, "ASL"}, {AXS, "AXS"}, {BCC, "BCC"}, {BCS, "BCS"},
+            {BEQ, "BEQ"}, {BIT, "BIT"}, {BMI, "BMI"}, {BNE, "BNE"}, {BPL, "BPL"},
+            {BRK, "BRK"}, {BVC, "BVC"}, {BVS, "BVS"}, {CLC, "CLC"}, {CLD, "CLD"},
+            {CLI, "CLI"}, {CLV, "CLV"}, {CMP, "CMP"}, {CPX, "CPX"}, {CPY, "CPY"},
+            {DCP, "DCP"}, {DEC, "DEC"}, {DEX, "DEX"}, {DEY, "DEY"}, {EOR, "EOR"},
+            {INC, "INC"}, {INX, "INX"}, {INY, "INY"}, {ISC, "ISC"}, {JMP, "JMP"},
+            {JSR, "JSR"}, {KIL, "KIL"}, {LAS, "LAS"}, {LAX, "LAX"}, {LDA, "LDA"},
+            {LDX, "LDX"}, {LDY, "LDY"}, {LSR, "LSR"}, {NOP, "NOP"}, {ORA, "ORA"},
+            {PHA, "PHA"}, {PHP, "PHP"}, {PLA, "PLA"}, {PLP, "PLP"}, {RLA, "RLA"},
+            {ROL, "ROL"}, {ROR, "ROR"}, {RRA, "RRA"}, {RTI, "RTI"}, {RTS, "RTS"},
+            {SAX, "SAX"}, {SBC, "SBC"}, {SEC, "SEC"}, {SED, "SED"}, {SEI, "SEI"},
+            {SHX, "SHX"}, {SHY, "SHY"}, {SLO, "SLO"}, {SRE, "SRE"}, {STA, "STA"},
+            {STX, "STX"}, {STY, "STY"}, {TAS, "TAS"}, {TAX, "TAX"}, {TAY, "TAY"},
+            {TSX, "TSX"}, {TXA, "TXA"}, {TXS, "TXS"}, {TYA, "TYA"}, {XAA, "XAA"}
         };
     }
 }
