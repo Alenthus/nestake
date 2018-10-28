@@ -39,7 +39,7 @@ namespace nestake {
     // ADC instruction
     void Cpu::_adc(uint16_t address, bool is_accumulator){
         uint8_t a = A;
-        uint8_t b = Memory->Read(address);
+        uint8_t b = mem->Read(address);
         A = a + b + C;
 
         // set Z & N flags
@@ -67,7 +67,7 @@ namespace nestake {
 
     // AND instruction
     void Cpu::_and(uint16_t address, bool is_accumulator){
-        A = A & Memory->Read(address);
+        A = A & mem->Read(address);
         // set Z & N flags
         setZN(A);
     }
@@ -84,10 +84,10 @@ namespace nestake {
             A <<= 1;
             setZN(A);
         } else {
-            uint8_t v = Memory->Read(address);
+            uint8_t v = mem->Read(address);
             C = (v >> 7) & uint8_t(1);
             v <<= 1;
-            Memory->Write(address, v);
+            mem->Write(address, v);
             setZN(v);
         }
     }
@@ -147,7 +147,7 @@ namespace nestake {
 
     // BIT operation
     void Cpu::_bit(uint16_t address, bool is_accumulator){
-        uint8_t v = Memory->Read(address);
+        uint8_t v = mem->Read(address);
         V = (v >> 6) & uint8_t(1);
         setZ(v & A);
         setN(v);
@@ -293,7 +293,7 @@ namespace nestake {
 
     // CMP instruction
     void Cpu::_cmp(uint16_t address, bool is_accumulator){
-        uint8_t v = Memory->Read(address);
+        uint8_t v = mem->Read(address);
         compare(A, v);
     };
 
@@ -304,7 +304,7 @@ namespace nestake {
 
     // CPX instruction
     void Cpu::_cpx(uint16_t address, bool is_accumulator){
-        uint8_t v = Memory->Read(address);
+        uint8_t v = mem->Read(address);
         _cmp(X, v);
     };
 
@@ -314,7 +314,7 @@ namespace nestake {
 
     // CPY instruction
     void Cpu::_cpy(uint16_t address, bool is_accumulator){
-        uint8_t v = Memory->Read(address);
+        uint8_t v = mem->Read(address);
         _cmp(Y, v);
     };
 
@@ -325,8 +325,8 @@ namespace nestake {
 
     // DEC instruction
     void Cpu::_dec(uint16_t address, bool is_accumulator){
-        uint8_t v = Memory->Read(address) - uint8_t(1);
-        Memory->Write(address, v);
+        uint8_t v = mem->Read(address) - uint8_t(1);
+        mem->Write(address, v);
         setZN(v);
     };
 
@@ -359,7 +359,7 @@ namespace nestake {
 
     // EOR instruction
     void Cpu::_eor(uint16_t address, bool is_accumulator){
-        A = A ^ Memory->Read(address);
+        A = A ^ mem->Read(address);
         setZN(A);
     };
 
@@ -370,8 +370,8 @@ namespace nestake {
 
     // INC instruction
     void Cpu::_inc(uint16_t address, bool is_accumulator){
-        uint8_t v = Memory->Read(address) + uint8_t(1);
-        Memory->Write(address, v);
+        uint8_t v = mem->Read(address) + uint8_t(1);
+        mem->Write(address, v);
         setZN(v);
     };
 
@@ -425,7 +425,7 @@ namespace nestake {
 
     // LDA operation
     void Cpu::_lda(uint16_t address, bool is_accumulator){
-        A = Memory->Read(address);
+        A = mem->Read(address);
         setZN(A);
     };
 
@@ -436,7 +436,7 @@ namespace nestake {
 
     // LDX operation
     void Cpu::_ldx(uint16_t address, bool is_accumulator){
-        X = Memory->Read(address);
+        X = mem->Read(address);
         setZN(X);
     };
 
@@ -447,7 +447,7 @@ namespace nestake {
 
     // LDY operation
     void Cpu::_ldy(uint16_t address, bool is_accumulator){
-        Y = Memory->Read(address);
+        Y = mem->Read(address);
         setZN(Y);
     };
 
@@ -463,10 +463,10 @@ namespace nestake {
             A >>= 1;
             setZN(A);
         } else {
-            uint8_t v = Memory->Read(address);
+            uint8_t v = mem->Read(address);
             C = v & uint8_t(1);
             v >>= 1;
-            Memory->Write(address, v);
+            mem->Write(address, v);
             setZN(v);
         }
     };
@@ -483,7 +483,7 @@ namespace nestake {
 
     // ORA operation
     void Cpu::_ora(uint16_t address, bool is_accumulator){
-        A = A | Memory->Read(address);
+        A = A | mem->Read(address);
         setZN(A);
     };
 
@@ -542,10 +542,10 @@ namespace nestake {
             setZN(A);
         } else {
             uint8_t prev_c = C;
-            uint8_t v = Memory->Read(address);
+            uint8_t v = mem->Read(address);
             C = (v >> 7) & uint8_t(1);
             v = (v << 1) | prev_c;
-            Memory->Write(address, v);
+            mem->Write(address, v);
             setZN(v);
         }
     };
@@ -564,10 +564,10 @@ namespace nestake {
             setZN(A);
         } else {
             uint8_t prev_c = C;
-            uint8_t v = Memory->Read(address);
+            uint8_t v = mem->Read(address);
             C = v & uint8_t(1);
             v = (v >> 1) | (prev_c << 7);
-            Memory->Write(address, v);
+            mem->Write(address, v);
             setZN(v);
         }
     };
@@ -601,7 +601,7 @@ namespace nestake {
     // SBC operation
     void Cpu::_sbc(uint16_t address, bool is_accumulator){
         uint8_t prev_a = A;
-        uint8_t b = Memory->Read(address);
+        uint8_t b = mem->Read(address);
         uint8_t prev_c = C;
 
         A = prev_a - b - (uint8_t(1) - prev_c);
@@ -656,7 +656,7 @@ namespace nestake {
 
     // STA operation
     void Cpu::_sta(uint16_t address, bool is_accumulator){
-        Memory->Write(address, A);
+        mem->Write(address, A);
     };
 
     void execSTA(Cpu *cpu, uint16_t address, bool is_accumulator) {
@@ -666,7 +666,7 @@ namespace nestake {
 
     // STX operation
     void Cpu::_stx(uint16_t address, bool is_accumulator){
-        Memory->Write(address, X);
+        mem->Write(address, X);
     };
 
     void execSTX(Cpu *cpu, uint16_t address, bool is_accumulator) {
@@ -676,7 +676,7 @@ namespace nestake {
 
     // STY operation
     void Cpu::_sty(uint16_t address, bool is_accumulator){
-        Memory->Write(address, Y);
+        mem->Write(address, Y);
     };
 
     void execSEY(Cpu *cpu, uint16_t address, bool is_accumulator) {
@@ -748,8 +748,8 @@ namespace nestake {
     }
 
     uint16_t Cpu::read16(uint16_t address) {
-        uint16_t lo = Memory->Read(address);
-        uint16_t hi = Memory->Read(address + uint16_t(1)) <<8;
+        uint16_t lo = mem->Read(address);
+        uint16_t hi = mem->Read(address + uint16_t(1)) <<8;
         return hi | lo;
     }
 
@@ -760,7 +760,7 @@ namespace nestake {
     }
 
     void Cpu::push(uint8_t v) {
-        Memory->Write(uint16_t(0x100)|uint16_t(SP), v);
+        mem->Write(uint16_t(0x100)|uint16_t(SP), v);
         --SP;
     }
 
@@ -827,11 +827,17 @@ namespace nestake {
 
     uint8_t Cpu::pull() {
         ++SP;
-        return Memory->Read(uint16_t(0x100)|uint16_t(SP));
+        return mem->Read(uint16_t(0x100)|uint16_t(SP));
     }
 
     uint16_t Cpu::pull16() {
         return uint16_t(pull()) << 8 | uint16_t(pull());
+    }
+
+    void Cpu::Reset() {
+        PC = mem->Read(0xFFFC);
+        SP = 0xFD;
+        setFlags(0x24);
     }
 
     void Cpu::TriggerIRQ() {
@@ -887,7 +893,7 @@ namespace nestake {
         bool page_crossed = false;
 
         // read opcode
-        uint8_t op = Memory->Read(PC);
+        uint8_t op = mem->Read(PC);
         InstructionParams inst = InstructionTable[op];
 
         // switch the instruction's condition according to the addressing mode
@@ -911,7 +917,7 @@ namespace nestake {
                 break;
             }
             case IndexedIndirect: {
-                address = read16Bug(Memory->Read(PC + uint16_t(1)) + uint16_t(X));
+                address = read16Bug(mem->Read(PC + uint16_t(1)) + uint16_t(X));
                 break;
             }
             case Indirect: {
@@ -919,12 +925,12 @@ namespace nestake {
                 break;
             }
             case IndirectIndexed: {
-                address = read16Bug(Memory->Read(PC + uint16_t(1))) + uint16_t(Y);
+                address = read16Bug(mem->Read(PC + uint16_t(1))) + uint16_t(Y);
                 page_crossed = isPageCrossed(address - uint16_t(Y), address);
                 break;
             }
             case Relative: {
-                uint16_t offset = Memory->Read(PC + uint16_t(1));
+                uint16_t offset = mem->Read(PC + uint16_t(1));
                 if (offset < 0x80) {
                     address = PC + uint16_t(2) + offset;
                 } else {
@@ -933,15 +939,15 @@ namespace nestake {
                 break;
             }
             case ZeroPage: {
-                address = Memory->Read(PC + uint16_t(1));
+                address = mem->Read(PC + uint16_t(1));
                 break;
             }
             case ZeroPageX: {
-                address = uint16_t((Memory->Read(PC + uint16_t(1)) + X) & 0xff);
+                address = uint16_t((mem->Read(PC + uint16_t(1)) + X) & 0xff);
                 break;
             }
             case ZeroPageY: {
-                address = uint16_t((Memory->Read(PC + uint16_t(1)) + Y) & 0xff);
+                address = uint16_t((mem->Read(PC + uint16_t(1)) + Y) & 0xff);
                 break;
             }
             default: {
@@ -965,7 +971,7 @@ namespace nestake {
         return Cycles - prev_cycles;
     }
 
-    void Setup() {
+    void Cpu::Setup(Memory* m) {
         // setup instruction table
         // ref: http://pgate1.at-ninja.jp/NES_on_FPGA/nes_cpu.htm#instruction
         InstructionTable = {
@@ -1128,5 +1134,9 @@ namespace nestake {
             {STX, "STX"}, {STY, "STY"}, {TAS, "TAS"}, {TAX, "TAX"}, {TAY, "TAY"},
             {TSX, "TSX"}, {TXA, "TXA"}, {TXS, "TXS"}, {TYA, "TYA"}, {XAA, "XAA"}
         };
+
+        // setup memory interface
+        mem = m;
+        Reset();
     }
 }

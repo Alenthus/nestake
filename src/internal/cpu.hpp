@@ -40,7 +40,7 @@ namespace nestake {
         bool IsDebugMode;
 
         // pointer to NesMemory interface
-        Memory* Memory;
+        Memory* mem;
 
         // cpu cycles
         uint64_t Cycles;
@@ -94,6 +94,7 @@ namespace nestake {
         uint64_t Step();
 
         // interruption related methods
+        void Reset();
         void TriggerIRQ();
         void TriggerNMI();
 
@@ -154,6 +155,9 @@ namespace nestake {
         void _txa(uint16_t, bool);
         void _txs(uint16_t, bool);
         void _tya(uint16_t, bool);
+
+        // setup (instruction table)
+        void Setup(Memory*);
     };
 
     // interface of instruction executor
@@ -182,8 +186,5 @@ namespace nestake {
     // map of all instructions
     std::map<uint8_t , InstructionParams> InstructionTable;
     std::map<int, std::string> idToInstructionName;
-
-    // setup (instruction table)
-    void Setup();
 }
 #endif
