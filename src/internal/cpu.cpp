@@ -33,7 +33,7 @@ namespace nestake {
     };
 
     bool isPageCrossed(uint16_t a, uint16_t b) {
-        return (a&0xFF00) == (b&0xFF00);
+        return (a&0xFF00) != (b&0xFF00);
     }
 
     // ADC instruction
@@ -511,7 +511,7 @@ namespace nestake {
     }
 
 
-    // PLA opeartion
+    // PLA operation
     void Cpu::_pla(uint16_t, bool){
         A = pull();
         setZN(A);
@@ -736,6 +736,7 @@ namespace nestake {
         cpu->_txs(address, is_accumulator);
     }
 
+
     // TYA operation
     void Cpu::_tya(uint16_t, bool){
         A = Y;
@@ -745,6 +746,7 @@ namespace nestake {
     void execTYA(Cpu *cpu, uint16_t address, bool is_accumulator) {
         cpu->_tya(address, is_accumulator);
     }
+
 
     uint16_t Cpu::read16(uint16_t address) {
         uint16_t lo = mem->Read(address);
@@ -834,6 +836,21 @@ namespace nestake {
     }
 
     void Cpu::Reset() {
+        Cycles = 0;
+        A = 0;
+        X = 0;
+        Y = 0;
+        C = 0;
+        Z = 0;
+        I = 0;
+        D = 0;
+        B = 0;
+        U = 0;
+        V = 0;
+        N = 0;
+        Interrupt = 0;
+        Stall = 0;
+
         PC = mem->Read(0xFFFC);
         SP = 0xFD;
         setFlags(0x24);
