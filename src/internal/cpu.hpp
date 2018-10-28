@@ -4,6 +4,7 @@
 #include <array>
 #include <functional>
 #include <map>
+#include <stdint.h>
 #include <string>
 
 #include "memory.hpp"

@@ -2,6 +2,7 @@
 #define NESTAKE_MEMORY
 
 #include <vector>
+#include <stdint.h>
 
 namespace nestake {
     class Memory {
