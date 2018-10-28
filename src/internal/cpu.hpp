@@ -157,7 +157,7 @@ namespace nestake {
         void _tya(uint16_t, bool);
 
         // setup (instruction table)
-        void Setup(Memory*);
+        explicit Cpu(Memory*);
     };
 
     // interface of instruction executor
