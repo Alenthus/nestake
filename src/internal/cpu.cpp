@@ -148,9 +148,9 @@ namespace nestake {
     // BIT operation
     void Cpu::_bit(uint16_t address, bool){
         uint8_t v = mem->Read(address);
-        V = (v >> 6) & uint8_t(1);
         setZ(v & A);
-        setN(v);
+        V = (v >> 6) & uint8_t(1);
+        setN((v >> 7) & uint8_t(1));
     };
 
     void execBIT(Cpu *cpu, uint16_t address, bool is_accumulator) {

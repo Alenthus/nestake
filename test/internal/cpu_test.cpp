@@ -207,7 +207,14 @@ TEST(CPUTest, BCC) {
 }
 
 TEST(CPUTest, BIT) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.A = 0b00000001;
+    mem.RAM[0] = 0b11000000;
+    cpu._bit(0, false);
+    EXPECT_EQ(1, cpu.Z);
+    //EXPECT_EQ(1, cpu.N);
+    EXPECT_EQ(1, cpu.V);
 }
 
 TEST(CPUTest, BRK) {
