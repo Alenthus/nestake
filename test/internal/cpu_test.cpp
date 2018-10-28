@@ -27,24 +27,61 @@ TEST(CPUTest, isPageCrossed) {
 }
 
 TEST(CPUTest, READ16) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    mem.RAM[0] = 0x02;
+    mem.RAM[1] = 0x10;
+
+    uint16_t actual = cpu.read16(0x00);
+    EXPECT_EQ(0x1002, actual);
 }
 
 
 TEST(CPUTest, READ16Bug) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    mem.RAM[0x0000] = 0x02;
+    mem.RAM[0x0100] = 0x33;
+
+    // address = 0x0000, _address = 0x0001 <<8 = 0x0100
+    uint16_t actual = cpu.read16Bug(0x0000);
+    EXPECT_EQ(0x3302, actual);
 }
 
 TEST(CPUTest, PUSH) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.SP = 0x10;
+    cpu.push(0x99);
+
+    // 0x10 - 1 = 0x0F
+    EXPECT_EQ(0x0F, cpu.SP);
+
+    // address = (0x0100 | 0x0010) = 0x0110
+    EXPECT_EQ(0x99, cpu.mem->RAM[0x0110]);
 }
 
 TEST(CPUTest, PULL) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.SP = 0x10;
+    cpu.mem->RAM[0x0111] = 0x96;
+    uint8_t actual = cpu.pull();
+
+    EXPECT_EQ(0x11, cpu.SP);
+    EXPECT_EQ(0x96, actual);
 }
 
 TEST(CPUTest, PULL16) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.SP = 0x10;
+    cpu.mem->RAM[0x0111] = 0x96;
+    cpu.mem->RAM[0x0112] = 0x98;
+    uint16_t actual = cpu.pull16();
+
+    EXPECT_EQ(0x12, cpu.SP);
+    EXPECT_EQ(0x9896, actual);
 }
 
 TEST(CPUTest, ADC) {

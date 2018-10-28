@@ -755,9 +755,10 @@ namespace nestake {
     }
 
     uint16_t Cpu::read16Bug(uint16_t address) {
-        uint16_t lo = address;
-        uint16_t hi = (address&uint16_t(0xFF00)) | uint16_t(address+1) <<8;
-        return uint16_t(hi)<<8 | uint16_t(lo);
+        uint16_t _address = (address&uint16_t(0xFF00)) | uint16_t(address+1) <<8;
+        uint16_t lo = mem->Read(address);
+        uint16_t hi = mem->Read(_address) <<8;
+        return hi | lo;
     }
 
     void Cpu::push(uint8_t v) {
@@ -832,7 +833,9 @@ namespace nestake {
     }
 
     uint16_t Cpu::pull16() {
-        return uint16_t(pull()) << 8 | uint16_t(pull());
+        uint16_t lo = pull();
+        uint16_t hi = pull();
+        return hi << 8 | lo;
     }
 
     void Cpu::Reset() {
