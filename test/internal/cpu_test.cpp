@@ -3,8 +3,6 @@
 
 #include <iostream>
 
-using std::cout;
-
 TEST(CPUTest, Initialization) {
     nestake::Memory mem = nestake::Memory{};
     nestake::Cpu cpu = nestake::Cpu(&mem);
@@ -160,15 +158,52 @@ TEST(CPUTest, ADC) {
 }
 
 TEST(CPUTest, AND) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.A = 0b10000001;
+    cpu.mem->RAM[0x0000] = 0b10000000;
+
+    cpu._and(0x0000, false);
+    EXPECT_EQ(0b10000000, cpu.A);
+    EXPECT_EQ(0, cpu.Z);
+    EXPECT_EQ(1, cpu.N);
 }
 
 TEST(CPUTest, ASL) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+
+    // accumulator mode
+    cpu.A = 0b10000001;
+    cpu.C = 0b00000000;
+
+    cpu._asl(0, true);
+    EXPECT_EQ(0b00000010, cpu.A);
+    EXPECT_EQ(1, cpu.C);
+
+    // non accumulator mode
+    mem.RAM[0] = 0b10000001;
+
+    cpu._asl(0, false);
+    EXPECT_EQ(0b00000010, mem.RAM[0]);
+    EXPECT_EQ(1, cpu.C);
 }
 
 TEST(CPUTest, BCC) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.C = 0;
+    cpu.Cycles = 0;
+
+    // page crossing
+    cpu._bcc(0x1000, false);
+    EXPECT_EQ(2, cpu.Cycles);
+    EXPECT_EQ(0x1000, cpu.PC);
+
+    // not page crossing
+    cpu._bcc(0x1001, false);
+    EXPECT_EQ(3, cpu.Cycles);
+    EXPECT_EQ(0x1001, cpu.PC);
 }
 
 TEST(CPUTest, BIT) {

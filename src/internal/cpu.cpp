@@ -80,7 +80,7 @@ namespace nestake {
     // ASL instruction
     void Cpu::_asl(uint16_t address, bool is_accumulator){
         if (is_accumulator) {
-            C = (C >> 7) & uint8_t(1);
+            C = (A >> 7) & uint8_t(1);
             A <<= 1;
             setZN(A);
         } else {
