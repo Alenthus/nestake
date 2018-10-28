@@ -133,7 +133,6 @@ namespace nestake {
         void _ldx(uint16_t, bool);
         void _ldy(uint16_t, bool);
         void _lsr(uint16_t, bool);
-        void _nop(uint16_t, bool);
         void _ora(uint16_t, bool);
         void _pha(uint16_t, bool);
         void _php(uint16_t, bool);
