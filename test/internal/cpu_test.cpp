@@ -24,6 +24,21 @@ TEST(CPUTest, isPageCrossed) {
     EXPECT_EQ(true, actual);
 }
 
+TEST(CPUTest, compare) {
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.compare(0x0000, 0x0000);
+    EXPECT_EQ(1, cpu.C);
+    EXPECT_EQ(1, cpu.Z);
+    EXPECT_EQ(0, cpu.N);
+
+    cpu.compare(0x0000, 0x0001);
+    EXPECT_EQ(0, cpu.C);
+    EXPECT_EQ(0, cpu.Z);
+    EXPECT_EQ(1, cpu.N);
+
+}
+
 TEST(CPUTest, READ16) {
     nestake::Memory mem = nestake::Memory{};
     nestake::Cpu cpu = nestake::Cpu(&mem);
@@ -217,24 +232,50 @@ TEST(CPUTest, BIT) {
     EXPECT_EQ(1, cpu.V);
 }
 
-TEST(CPUTest, BRK) {
-    EXPECT_EQ(true, true);
-}
-
 TEST(CPUTest, CMP) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.A = 1;
+    mem.RAM[0] = 0;
+    cpu._cmp(0, false);
+    EXPECT_EQ(1, cpu.C);
+    EXPECT_EQ(0, cpu.Z);
+    EXPECT_EQ(1, cpu.N);
+
 }
 
 TEST(CPUTest, DEC) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    mem.RAM[0] = 1;
+
+    cpu._dec(0, false);
+    EXPECT_EQ(0, mem.RAM[0]);
+    EXPECT_EQ(1, cpu.Z);
+    EXPECT_EQ(0, cpu.N);
 }
 
 TEST(CPUTest, DEX) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.X = 100;
+
+    cpu._dex(0, false);
+    EXPECT_EQ(99, cpu.X);
+    EXPECT_EQ(1, cpu.N);
+    EXPECT_EQ(0, cpu.Z);
 }
 
 TEST(CPUTest, EOR) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    mem.RAM[0] = 0b10000001;
+    cpu.A   = 0b10001000;
+
+    cpu._eor(0, false);
+    EXPECT_EQ(0b00001001, cpu.A);
+    EXPECT_EQ(1, cpu.N);
+    EXPECT_EQ(0, cpu.Z);
 }
 
 TEST(CPUTest, INC) {

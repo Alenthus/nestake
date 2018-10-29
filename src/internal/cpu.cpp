@@ -762,7 +762,7 @@ namespace nestake {
     }
 
     void Cpu::push(uint8_t v) {
-        mem->Write(uint16_t(0x100)|uint16_t(SP), v);
+        mem->Write(uint16_t(0x0100)|uint16_t(SP), v);
         --SP;
     }
 
@@ -777,7 +777,6 @@ namespace nestake {
         } else {
             N = 0;
         }
-
     }
 
     void Cpu::setZ(uint8_t v) {
