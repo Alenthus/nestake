@@ -228,7 +228,7 @@ TEST(CPUTest, BIT) {
     mem.RAM[0] = 0b11000000;
     cpu._bit(0, false);
     EXPECT_EQ(1, cpu.Z);
-    //EXPECT_EQ(1, cpu.N);
+    EXPECT_EQ(1, cpu.N);
     EXPECT_EQ(1, cpu.V);
 }
 
@@ -311,7 +311,14 @@ TEST(CPUTest, LSR) {
 }
 
 TEST(CPUTest, ORA) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    mem.RAM[0] = 0b00000011;
+    cpu.A = 0b10000000;
+
+
+    cpu._ora(0, false);
+    EXPECT_EQ(0b10000011, cpu.A);
 }
 
 TEST(CPUTest, PHP) {
