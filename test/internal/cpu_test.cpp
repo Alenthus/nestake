@@ -279,15 +279,31 @@ TEST(CPUTest, EOR) {
 }
 
 TEST(CPUTest, INC) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    mem.RAM[0] = 1;
+
+    cpu._inc(0, false);
+    EXPECT_EQ(2, mem.RAM[0]);
+    EXPECT_EQ(0, cpu.Z);
+    EXPECT_EQ(1, cpu.N);
 }
 
 TEST(CPUTest, JSR) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.PC = 100;
+    cpu._jsr(0, false);
+    EXPECT_EQ(0, cpu.PC);
 }
 
 TEST(CPUTest, LDA) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    mem.RAM[0] = 100;
+
+    cpu._lda(0, false);
+    EXPECT_EQ(100, cpu.A);
 }
 
 TEST(CPUTest, LSR) {
