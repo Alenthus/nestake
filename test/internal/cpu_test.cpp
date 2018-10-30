@@ -354,25 +354,112 @@ TEST(CPUTest, PHP) {
 }
 
 TEST(CPUTest, PLP) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.SP = 0b10000000;
+    mem.RAM[0x100|0b10000001] = 0b00000010;
+
+    cpu._plp(0, false);
+    EXPECT_EQ(0b00100010, cpu.getFlag());
 }
 
 TEST(CPUTest, ROL) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+
+    // accumulator mode
+    cpu.A = 0b01111110;
+    cpu.C = 1;
+    cpu._rol(0, true);
+    EXPECT_EQ(0b11111101, cpu.A);
+
+    // non accumulator mode
+    mem.RAM[0] = 0b01111110;
+    cpu.C = 1;
+    cpu._rol(0, false);
+    EXPECT_EQ(0b11111101, mem.RAM[0]);
 }
 
 TEST(CPUTest, ROR) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+
+    // accumulator mode
+    cpu.A = 0b01111110;
+    cpu.C = 1;
+    cpu._ror(0, true);
+    EXPECT_EQ(0b10111111, cpu.A);
+
+    // non accumulator mode
+    mem.RAM[0] = 0b01111110;
+    cpu.C = 1;
+    cpu._ror(0, false);
+    EXPECT_EQ(0b10111111, mem.RAM[0]);
 }
 
 TEST(CPUTest, RTI) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.SP = 0;
+    mem.RAM[0b00000001|0x100] = 0b00000011;
+    cpu._rti(0, false);
+
+    uint8_t actual = cpu.getFlag();
+    EXPECT_EQ(0b00100011, actual);
 }
 
 TEST(CPUTest, RTS) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.SP = 10;
+    mem.RAM[0x100|11] = 0x55;
+    mem.RAM[0x100|12] = 0x99;
+    cpu._rts(0, false);
+    EXPECT_EQ(12, cpu.SP);
+    EXPECT_EQ(0x9956, cpu.PC);
 }
 
 TEST(CPUTest, SBC) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+
+    // Neither overflow nor carry case
+    cpu.A = 1;
+    cpu.C = 1;
+    mem.RAM[0x0000] = 1;
+    cpu._sbc(0x0000, false);
+
+    EXPECT_EQ(0, cpu.A);
+    EXPECT_EQ(1, cpu.C);
+    EXPECT_EQ(0, cpu.V);
+
+    // NOT overflow BUT carry
+    cpu.A = 1;
+    cpu.C = 1;
+    mem.RAM[0x0000] = 2;
+    cpu._sbc(0x0000, false);
+
+    EXPECT_EQ(0xFF, cpu.A);
+    EXPECT_EQ(0, cpu.C);
+    EXPECT_EQ(0, cpu.V);
+
+    // NOT carry BUT overflow
+    cpu.A = 0b10000000;
+    cpu.C = 1;
+    mem.RAM[0x0000] = 1;
+    cpu._sbc(0x0000, false);
+
+    EXPECT_EQ(0b01111111, cpu.A);
+    EXPECT_EQ(1, cpu.C);
+    EXPECT_EQ(1, cpu.V);
+
+    // overflow AND carry
+    cpu.A = 0b10000000;
+    cpu.C = 1;
+    mem.RAM[0x0000] = 0b10000001;
+    cpu._sbc(0x0000, false);
+
+    EXPECT_EQ(0xFF, cpu.A);
+    EXPECT_EQ(0, cpu.C);
+    EXPECT_EQ(0, cpu.V);
 }

@@ -59,7 +59,6 @@ namespace nestake {
             V = 0;
         }
     }
-
     void execADC(Cpu *cpu, uint16_t address, bool is_accumulator) {
         cpu->_adc(address, is_accumulator);
     }
