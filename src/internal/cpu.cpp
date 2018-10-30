@@ -33,11 +33,11 @@ namespace nestake {
     };
 
     bool isPageCrossed(uint16_t a, uint16_t b) {
-        return (a&0xFF00) == (b&0xFF00);
+        return (a&0xFF00) != (b&0xFF00);
     }
 
     // ADC instruction
-    void Cpu::_adc(uint16_t address, bool is_accumulator){
+    void Cpu::_adc(uint16_t address, bool){
         uint8_t a = A;
         uint8_t b = mem->Read(address);
         A = a + b + C;
@@ -59,14 +59,13 @@ namespace nestake {
             V = 0;
         }
     }
-
     void execADC(Cpu *cpu, uint16_t address, bool is_accumulator) {
         cpu->_adc(address, is_accumulator);
     }
 
 
     // AND instruction
-    void Cpu::_and(uint16_t address, bool is_accumulator){
+    void Cpu::_and(uint16_t address, bool){
         A = A & mem->Read(address);
         // set Z & N flags
         setZN(A);
@@ -80,7 +79,7 @@ namespace nestake {
     // ASL instruction
     void Cpu::_asl(uint16_t address, bool is_accumulator){
         if (is_accumulator) {
-            C = (C >> 7) & uint8_t(1);
+            C = (A >> 7) & uint8_t(1);
             A <<= 1;
             setZN(A);
         } else {
@@ -98,7 +97,7 @@ namespace nestake {
 
 
     // BCC instruction
-    void Cpu::_bcc(uint16_t address, bool is_accumulator){
+    void Cpu::_bcc(uint16_t address, bool){
         if (C == 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -114,7 +113,7 @@ namespace nestake {
 
 
     // BCS instruction
-    void Cpu::_bcs(uint16_t address, bool is_accumulator){
+    void Cpu::_bcs(uint16_t address, bool){
         if (C != 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -130,7 +129,7 @@ namespace nestake {
 
 
     // BEQ instruction
-    void Cpu::_beq(uint16_t address, bool is_accumulator){
+    void Cpu::_beq(uint16_t address, bool){
         if (Z != 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -141,16 +140,16 @@ namespace nestake {
     };
 
     void execBEQ(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bcs(address, is_accumulator);
+        cpu->_beq(address, is_accumulator);
     }
 
 
     // BIT operation
-    void Cpu::_bit(uint16_t address, bool is_accumulator){
+    void Cpu::_bit(uint16_t address, bool){
         uint8_t v = mem->Read(address);
-        V = (v >> 6) & uint8_t(1);
         setZ(v & A);
-        setN(v);
+        V = (v >> 6) & uint8_t(1);
+        setN((v >> 7) & uint8_t(1));
     };
 
     void execBIT(Cpu *cpu, uint16_t address, bool is_accumulator) {
@@ -159,7 +158,7 @@ namespace nestake {
 
 
     // BMI params
-    void Cpu::_bmi(uint16_t address, bool is_accumulator){
+    void Cpu::_bmi(uint16_t address, bool){
         if (N != 0){
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -175,7 +174,7 @@ namespace nestake {
 
 
     // BNE operation
-    void Cpu::_bne(uint16_t address, bool is_accumulator){
+    void Cpu::_bne(uint16_t address, bool){
         if (Z == 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -191,7 +190,7 @@ namespace nestake {
 
 
     // BPL operation
-    void Cpu::_bpl(uint16_t address, bool is_accumulator){
+    void Cpu::_bpl(uint16_t address, bool){
         if (N == 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -220,7 +219,7 @@ namespace nestake {
 
 
     // BVC instruction
-    void Cpu::_bvc(uint16_t address, bool is_accumulator){
+    void Cpu::_bvc(uint16_t address, bool){
         if (V == 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -231,12 +230,12 @@ namespace nestake {
     };
 
     void execBVC(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_brk(address, is_accumulator);
+        cpu->_bvc(address, is_accumulator);
     }
 
 
     // BVS instruction
-    void Cpu::_bvs(uint16_t address, bool is_accumulator){
+    void Cpu::_bvs(uint16_t address, bool){
         if (V != 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -252,7 +251,7 @@ namespace nestake {
 
 
     // CLC instruction
-    void Cpu::_clc(uint16_t address, bool is_accumulator){
+    void Cpu::_clc(uint16_t, bool){
         C = 0;
     };
 
@@ -262,7 +261,7 @@ namespace nestake {
 
 
     // CLD instruction
-    void Cpu::_cld(uint16_t address, bool is_accumulator){
+    void Cpu::_cld(uint16_t, bool){
         D = 0;
     };
 
@@ -272,7 +271,7 @@ namespace nestake {
 
 
     // CLI instruction
-    void Cpu::_cli(uint16_t address, bool is_accumulator){
+    void Cpu::_cli(uint16_t, bool){
         I = 0;
     };
 
@@ -282,7 +281,7 @@ namespace nestake {
 
 
     // CLV instruction
-    void Cpu::_clv(uint16_t address, bool is_accumulator){
+    void Cpu::_clv(uint16_t, bool){
         V = 0;
     };
 
@@ -292,7 +291,7 @@ namespace nestake {
 
 
     // CMP instruction
-    void Cpu::_cmp(uint16_t address, bool is_accumulator){
+    void Cpu::_cmp(uint16_t address, bool){
         uint8_t v = mem->Read(address);
         compare(A, v);
     };
@@ -303,7 +302,7 @@ namespace nestake {
 
 
     // CPX instruction
-    void Cpu::_cpx(uint16_t address, bool is_accumulator){
+    void Cpu::_cpx(uint16_t address, bool){
         uint8_t v = mem->Read(address);
         _cmp(X, v);
     };
@@ -313,7 +312,7 @@ namespace nestake {
     }
 
     // CPY instruction
-    void Cpu::_cpy(uint16_t address, bool is_accumulator){
+    void Cpu::_cpy(uint16_t address, bool){
         uint8_t v = mem->Read(address);
         _cmp(Y, v);
     };
@@ -324,7 +323,7 @@ namespace nestake {
 
 
     // DEC instruction
-    void Cpu::_dec(uint16_t address, bool is_accumulator){
+    void Cpu::_dec(uint16_t address, bool){
         uint8_t v = mem->Read(address) - uint8_t(1);
         mem->Write(address, v);
         setZN(v);
@@ -336,7 +335,7 @@ namespace nestake {
 
 
     // DEX instruction
-    void Cpu::_dex(uint16_t address, bool is_accumulator){
+    void Cpu::_dex(uint16_t, bool){
         --X;
         setZN(X);
     };
@@ -347,7 +346,7 @@ namespace nestake {
 
 
     // DEY instruction
-    void Cpu::_dey(uint16_t address, bool is_accumulator){
+    void Cpu::_dey(uint16_t, bool){
         --Y;
         setZN(Y);
     };
@@ -358,7 +357,7 @@ namespace nestake {
 
 
     // EOR instruction
-    void Cpu::_eor(uint16_t address, bool is_accumulator){
+    void Cpu::_eor(uint16_t address, bool){
         A = A ^ mem->Read(address);
         setZN(A);
     };
@@ -369,7 +368,7 @@ namespace nestake {
 
 
     // INC instruction
-    void Cpu::_inc(uint16_t address, bool is_accumulator){
+    void Cpu::_inc(uint16_t address, bool){
         uint8_t v = mem->Read(address) + uint8_t(1);
         mem->Write(address, v);
         setZN(v);
@@ -381,7 +380,7 @@ namespace nestake {
 
 
     // INX instruction
-    void Cpu::_inx(uint16_t address, bool is_accumulator){
+    void Cpu::_inx(uint16_t, bool){
         ++X;
         setZN(X);
     };
@@ -392,7 +391,7 @@ namespace nestake {
 
 
     // INY instruction
-    void Cpu::_iny(uint16_t address, bool is_accumulator){
+    void Cpu::_iny(uint16_t, bool){
         ++Y;
         setZN(Y);
     };
@@ -403,7 +402,7 @@ namespace nestake {
 
 
     // JMP operation
-    void Cpu::_jmp(uint16_t address, bool is_accumulator){
+    void Cpu::_jmp(uint16_t address, bool){
         PC = address;
     };
 
@@ -413,7 +412,7 @@ namespace nestake {
 
 
     // JSR operation
-    void Cpu::_jsr(uint16_t address, bool is_accumulator){
+    void Cpu::_jsr(uint16_t address, bool){
         push16(PC - uint8_t(1));
         PC = address;
     };
@@ -424,7 +423,7 @@ namespace nestake {
 
 
     // LDA operation
-    void Cpu::_lda(uint16_t address, bool is_accumulator){
+    void Cpu::_lda(uint16_t address, bool){
         A = mem->Read(address);
         setZN(A);
     };
@@ -435,7 +434,7 @@ namespace nestake {
 
 
     // LDX operation
-    void Cpu::_ldx(uint16_t address, bool is_accumulator){
+    void Cpu::_ldx(uint16_t address, bool){
         X = mem->Read(address);
         setZN(X);
     };
@@ -446,7 +445,7 @@ namespace nestake {
 
 
     // LDY operation
-    void Cpu::_ldy(uint16_t address, bool is_accumulator){
+    void Cpu::_ldy(uint16_t address, bool){
         Y = mem->Read(address);
         setZN(Y);
     };
@@ -477,12 +476,11 @@ namespace nestake {
 
 
     // NOP operation
-    void Cpu::_nop(uint16_t address, bool is_accumulator){};
-    void execNOP(Cpu *cpu, uint16_t address, bool is_accumulator) {}
+    void execNOP(Cpu*, uint16_t, bool) {}
 
 
     // ORA operation
-    void Cpu::_ora(uint16_t address, bool is_accumulator){
+    void Cpu::_ora(uint16_t address, bool){
         A = A | mem->Read(address);
         setZN(A);
     };
@@ -493,7 +491,7 @@ namespace nestake {
 
 
     // PHA operation
-    void Cpu::_pha(uint16_t address, bool is_accumulator){
+    void Cpu::_pha(uint16_t, bool){
         push(A);
     };
 
@@ -503,7 +501,7 @@ namespace nestake {
 
 
     // PHP operation
-    void Cpu::_php(uint16_t address, bool is_accumulator){
+    void Cpu::_php(uint16_t, bool){
         push(getFlag()|uint8_t(0x10));
     };
 
@@ -512,8 +510,8 @@ namespace nestake {
     }
 
 
-    // PLA opeartion
-    void Cpu::_pla(uint16_t address, bool is_accumulator){
+    // PLA operation
+    void Cpu::_pla(uint16_t, bool){
         A = pull();
         setZN(A);
     };
@@ -524,7 +522,7 @@ namespace nestake {
 
 
     // PLP operation
-    void Cpu::_plp(uint16_t address, bool is_accumulator){
+    void Cpu::_plp(uint16_t, bool){
         setFlags((pull()&uint8_t(0xEF))| uint8_t(0x20));
     };
 
@@ -578,7 +576,7 @@ namespace nestake {
 
 
     // RTI operation
-    void Cpu::_rti(uint16_t address, bool is_accumulator){
+    void Cpu::_rti(uint16_t, bool){
         setFlags((pull()&uint8_t(0xEF))| uint8_t(0x20));
         PC = pull16();
     };
@@ -589,7 +587,7 @@ namespace nestake {
 
 
     // RTS operation
-    void Cpu::_rts(uint16_t address, bool is_accumulator){
+    void Cpu::_rts(uint16_t, bool){
         PC = pull16() + uint16_t(1);
     };
 
@@ -599,7 +597,7 @@ namespace nestake {
 
 
     // SBC operation
-    void Cpu::_sbc(uint16_t address, bool is_accumulator){
+    void Cpu::_sbc(uint16_t address, bool){
         uint8_t prev_a = A;
         uint8_t b = mem->Read(address);
         uint8_t prev_c = C;
@@ -625,7 +623,7 @@ namespace nestake {
     }
 
     // SEC operation
-    void Cpu::_sec(uint16_t address, bool is_accumulator){
+    void Cpu::_sec(uint16_t, bool){
         C = 1;
     };
 
@@ -635,7 +633,7 @@ namespace nestake {
 
 
     // SED operation
-    void Cpu::_sed(uint16_t address, bool is_accumulator){
+    void Cpu::_sed(uint16_t, bool){
         D = 1;
     };
 
@@ -645,7 +643,7 @@ namespace nestake {
 
 
     // SEI operation
-    void Cpu::_sei(uint16_t address, bool is_accumulator){
+    void Cpu::_sei(uint16_t, bool){
         I = 1;
     };
 
@@ -655,7 +653,7 @@ namespace nestake {
 
 
     // STA operation
-    void Cpu::_sta(uint16_t address, bool is_accumulator){
+    void Cpu::_sta(uint16_t address, bool){
         mem->Write(address, A);
     };
 
@@ -665,7 +663,7 @@ namespace nestake {
 
 
     // STX operation
-    void Cpu::_stx(uint16_t address, bool is_accumulator){
+    void Cpu::_stx(uint16_t address, bool){
         mem->Write(address, X);
     };
 
@@ -675,17 +673,17 @@ namespace nestake {
 
 
     // STY operation
-    void Cpu::_sty(uint16_t address, bool is_accumulator){
+    void Cpu::_sty(uint16_t address, bool){
         mem->Write(address, Y);
     };
 
-    void execSEY(Cpu *cpu, uint16_t address, bool is_accumulator) {
+    void execSTY(Cpu *cpu, uint16_t address, bool is_accumulator) {
         cpu->_sty(address, is_accumulator);
     }
 
 
     // TAX operation
-    void Cpu::_tax(uint16_t address, bool is_accumulator){
+    void Cpu::_tax(uint16_t, bool){
         X = A;
         setZN(X);
     };
@@ -696,7 +694,7 @@ namespace nestake {
 
 
     // TAY operation
-    void Cpu::_tay(uint16_t address, bool is_accumulator){
+    void Cpu::_tay(uint16_t, bool){
         Y = A;
         setZN(Y);
     };
@@ -707,7 +705,7 @@ namespace nestake {
 
 
     // TSX operation
-    void Cpu::_tsx(uint16_t address, bool is_accumulator){
+    void Cpu::_tsx(uint16_t, bool){
         X = SP;
         setZN(X);
     };
@@ -718,7 +716,7 @@ namespace nestake {
 
 
     // TXA operation
-    void Cpu::_txa(uint16_t address, bool is_accumulator){
+    void Cpu::_txa(uint16_t, bool){
         A = X;
         setZN(A);
     };
@@ -729,7 +727,7 @@ namespace nestake {
 
 
     // TXS operation
-    void Cpu::_txs(uint16_t address, bool is_accumulator){
+    void Cpu::_txs(uint16_t, bool){
         SP = X;
     };
 
@@ -737,8 +735,9 @@ namespace nestake {
         cpu->_txs(address, is_accumulator);
     }
 
+
     // TYA operation
-    void Cpu::_tya(uint16_t address, bool is_accumulator){
+    void Cpu::_tya(uint16_t, bool){
         A = Y;
         setZN(A);
     };
@@ -747,6 +746,7 @@ namespace nestake {
         cpu->_tya(address, is_accumulator);
     }
 
+
     uint16_t Cpu::read16(uint16_t address) {
         uint16_t lo = mem->Read(address);
         uint16_t hi = mem->Read(address + uint16_t(1)) <<8;
@@ -754,13 +754,14 @@ namespace nestake {
     }
 
     uint16_t Cpu::read16Bug(uint16_t address) {
-        uint16_t lo = address;
-        uint16_t hi = (address&uint16_t(0xFF00)) | uint16_t(address+1) <<8;
-        return uint16_t(hi)<<8 | uint16_t(lo);
+        uint16_t _address = (address&uint16_t(0xFF00)) | uint16_t(address+1) <<8;
+        uint16_t lo = mem->Read(address);
+        uint16_t hi = mem->Read(_address) <<8;
+        return hi | lo;
     }
 
     void Cpu::push(uint8_t v) {
-        mem->Write(uint16_t(0x100)|uint16_t(SP), v);
+        mem->Write(uint16_t(0x0100)|uint16_t(SP), v);
         --SP;
     }
 
@@ -775,7 +776,6 @@ namespace nestake {
         } else {
             N = 0;
         }
-
     }
 
     void Cpu::setZ(uint8_t v) {
@@ -801,7 +801,7 @@ namespace nestake {
     }
 
     void Cpu::setFlags(uint8_t flag) {
-        C = (flag >> 0) & uint8_t(1);
+        C = flag & uint8_t(1);
         Z = (flag >> 1) & uint8_t(1);
         I = (flag >> 2) & uint8_t(1);
         D = (flag >> 3) & uint8_t(1);
@@ -813,8 +813,7 @@ namespace nestake {
 
 
     uint8_t Cpu::getFlag() {
-        uint8_t flag = 0;
-        flag |= C << 0;
+        uint8_t flag = C;
         flag |= Z << 1;
         flag |= I << 2;
         flag |= D << 3;
@@ -831,10 +830,27 @@ namespace nestake {
     }
 
     uint16_t Cpu::pull16() {
-        return uint16_t(pull()) << 8 | uint16_t(pull());
+        uint16_t lo = pull();
+        uint16_t hi = pull();
+        return hi << 8 | lo;
     }
 
     void Cpu::Reset() {
+        Cycles = 0;
+        A = 0;
+        X = 0;
+        Y = 0;
+        C = 0;
+        Z = 0;
+        I = 0;
+        D = 0;
+        B = 0;
+        U = 0;
+        V = 0;
+        N = 0;
+        Interrupt = 0;
+        Stall = 0;
+
         PC = mem->Read(0xFFFC);
         SP = 0xFD;
         setFlags(0x24);
@@ -1100,8 +1116,8 @@ namespace nestake {
             {0x8E, {STX, Absolute, 3, 4, 0, execSTX}},
 
             // STY
-            {0x84, {STX, ZeroPage, 2, 3, 0, execSTX}}, {0x94, {STX, ZeroPageX, 2, 4, 0, execSTX}},
-            {0x8C, {STX, Absolute, 3, 4, 0, execSTX}},
+            {0x84, {STY, ZeroPage, 2, 3, 0, execSTY}}, {0x94, {STY, ZeroPageX, 2, 4, 0, execSTY}},
+            {0x8C, {STY, Absolute, 3, 4, 0, execSTY}},
 
             // transfer related
             {0xAA, {TAX, Implied, 1, 2, 0, execTAX}}, {0x8A, {TXA, Implied, 1, 2, 0, execTXA}},

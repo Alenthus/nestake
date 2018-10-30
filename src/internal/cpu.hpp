@@ -11,7 +11,7 @@
 
 namespace nestake {
     class Cpu {
-    private:
+    public:
         // flag related
         uint8_t getFlag();
         void setZ(uint8_t v);
@@ -36,7 +36,6 @@ namespace nestake {
         uint16_t read16(uint16_t);
         uint16_t read16Bug(uint16_t);
 
-    public:
         // debug flag
         bool IsDebugMode;
 
@@ -133,7 +132,6 @@ namespace nestake {
         void _ldx(uint16_t, bool);
         void _ldy(uint16_t, bool);
         void _lsr(uint16_t, bool);
-        void _nop(uint16_t, bool);
         void _ora(uint16_t, bool);
         void _pha(uint16_t, bool);
         void _php(uint16_t, bool);
@@ -187,5 +185,7 @@ namespace nestake {
     // map of all instructions
     std::map<uint8_t , InstructionParams> InstructionTable;
     std::map<int, std::string> idToInstructionName;
+
+    bool isPageCrossed(uint16_t, uint16_t);
 }
 #endif
