@@ -307,7 +307,20 @@ TEST(CPUTest, LDA) {
 }
 
 TEST(CPUTest, LSR) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+
+    //  accumulator mode
+    cpu.A = 0b00000011;
+    cpu._lsr(0, true);
+    EXPECT_EQ(1, cpu.C);
+    EXPECT_EQ(0b00000001, cpu.A);
+
+    //  non accumulator mode
+    mem.RAM[0] = 0b00000011;
+    cpu._lsr(0, false);
+    EXPECT_EQ(1, cpu.C);
+    EXPECT_EQ(0b00000001, mem.RAM[0]);
 }
 
 TEST(CPUTest, ORA) {
@@ -322,7 +335,22 @@ TEST(CPUTest, ORA) {
 }
 
 TEST(CPUTest, PHP) {
-    EXPECT_EQ(true, true);
+    nestake::Memory mem = nestake::Memory{};
+    nestake::Cpu cpu = nestake::Cpu(&mem);
+    cpu.C = 1;
+    cpu.Z = 0;
+    cpu.I = 0;
+    cpu.D = 1;
+    cpu.B = 0;
+    cpu.U = 0;
+    cpu.V = 0;
+    cpu.N = 1;
+    EXPECT_EQ(0b10001001, cpu.getFlag());
+
+    cpu.SP = 100;
+    cpu._php(0, false);
+    EXPECT_EQ(0b10011001, mem.RAM[0x0100|100]);
+    EXPECT_EQ(99, cpu.SP);
 }
 
 TEST(CPUTest, PLP) {
