@@ -987,7 +987,7 @@ namespace nestake {
         return Cycles - prev_cycles;
     }
 
-    Cpu::Cpu(Memory* m) {
+    Cpu::Cpu(std::shared_ptr<Memory> m) {
         // setup instruction table
         // ref: http://pgate1.at-ninja.jp/NES_on_FPGA/nes_cpu.htm#instruction
         InstructionTable = {

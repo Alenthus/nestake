@@ -41,7 +41,7 @@ namespace nestake {
         bool IsDebugMode;
 
         // pointer to NesMemory interface
-        Memory* mem;
+        std::shared_ptr<Memory> mem;
 
         // cpu cycles
         uint64_t Cycles;
@@ -157,7 +157,7 @@ namespace nestake {
         void _tya(uint16_t, bool);
 
         // setup (instruction table)
-        explicit Cpu(Memory*);
+        explicit Cpu(std::shared_ptr<Memory>);
     };
 
     // interface of instruction executor
