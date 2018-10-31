@@ -8,6 +8,7 @@
 #include <string>
 
 #include "memory.hpp"
+#include<memory>
 
 namespace nestake {
     class Cpu {
