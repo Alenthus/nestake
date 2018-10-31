@@ -7,8 +7,9 @@ download_project(PROJ googletest
         )
 
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/src/internal)
+include_directories(${PROJECT_SOURCE_DIR}/src)
 include(GoogleTest)
 
-add_subdirectory(internal)
-add_subdirectory(ui)
+add_executable(TestCPU cpu_test.cpp)
+target_link_libraries(TestCPU cpu gtest_main)
+gtest_add_tests(TARGET TestCPU)

@@ -1,5 +1,7 @@
 # nestake
 
+[![CircleCI](https://circleci.com/gh/mathetake/nestake.svg?style=shield)](https://circleci.com/gh/mathetake/nestake)
+
 a NES emulator written in c++
 
 

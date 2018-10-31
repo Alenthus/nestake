@@ -4,8 +4,8 @@
 #include <iostream>
 
 TEST(CPUTest, Initialization) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     // TODO: change `0` to appropriate one after implementing mapper
     EXPECT_EQ(0, cpu.PC);
     EXPECT_EQ(0xFD, cpu.SP);
@@ -25,8 +25,8 @@ TEST(CPUTest, isPageCrossed) {
 }
 
 TEST(CPUTest, compare) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.compare(0x0000, 0x0000);
     EXPECT_EQ(1, cpu.C);
     EXPECT_EQ(1, cpu.Z);
@@ -40,10 +40,10 @@ TEST(CPUTest, compare) {
 }
 
 TEST(CPUTest, READ16) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
-    mem.RAM[0] = 0x02;
-    mem.RAM[1] = 0x10;
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
+    mem->RAM[0] = 0x02;
+    mem->RAM[1] = 0x10;
 
     uint16_t actual = cpu.read16(0x00);
     EXPECT_EQ(0x1002, actual);
@@ -51,10 +51,10 @@ TEST(CPUTest, READ16) {
 
 
 TEST(CPUTest, READ16Bug) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
-    mem.RAM[0x0000] = 0x02;
-    mem.RAM[0x0100] = 0x33;
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
+    mem->RAM[0x0000] = 0x02;
+    mem->RAM[0x0100] = 0x33;
 
     // address = 0x0000, _address = 0x0001 <<8 = 0x0100
     uint16_t actual = cpu.read16Bug(0x0000);
@@ -62,8 +62,8 @@ TEST(CPUTest, READ16Bug) {
 }
 
 TEST(CPUTest, PUSH) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0x10;
     cpu.push(0x99);
 
@@ -75,8 +75,8 @@ TEST(CPUTest, PUSH) {
 }
 
 TEST(CPUTest, PULL) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0x10;
     cpu.mem->RAM[0x0111] = 0x96;
     uint8_t actual = cpu.pull();
@@ -86,8 +86,8 @@ TEST(CPUTest, PULL) {
 }
 
 TEST(CPUTest, PULL16) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0x10;
     cpu.mem->RAM[0x0111] = 0x96;
     cpu.mem->RAM[0x0112] = 0x98;
@@ -98,8 +98,8 @@ TEST(CPUTest, PULL16) {
 }
 
 TEST(CPUTest, GetFlag) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.C = 1;
     cpu.Z = 0;
     cpu.I = 0;
@@ -114,8 +114,8 @@ TEST(CPUTest, GetFlag) {
 
 
 TEST(CPUTest, SetFlags) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.setFlags(0b10001001);
     EXPECT_EQ(1, cpu.C);
     EXPECT_EQ(0, cpu.Z);
@@ -128,14 +128,14 @@ TEST(CPUTest, SetFlags) {
 }
 
 TEST(CPUTest, ADC) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
 
     // Neither overflow nor carry case
     cpu.A = 0;
     cpu.C = 0;
-    mem.RAM[0x0000] = 1;
-    cpu._adc(0x0000, false);
+    mem->RAM[0x0000] = 1;
+    cpu.ExecADC(0x0000, false);
 
     EXPECT_EQ(1, cpu.A);
     EXPECT_EQ(0, cpu.Z);
@@ -144,8 +144,8 @@ TEST(CPUTest, ADC) {
     // NOT overflow BUT carry
     cpu.A = 1;
     cpu.C = 0;
-    mem.RAM[0x0000] = 0xFF;
-    cpu._adc(0x0000, false);
+    mem->RAM[0x0000] = 0xFF;
+    cpu.ExecADC(0x0000, false);
 
     EXPECT_EQ(0x00, cpu.A);
     EXPECT_EQ(1, cpu.C);
@@ -154,8 +154,8 @@ TEST(CPUTest, ADC) {
     // NOT carry BUT overflow
     cpu.A = 0b01000000;
     cpu.C = 0;
-    mem.RAM[0x0000] = 0b01000000;
-    cpu._adc(0x0000, false);
+    mem->RAM[0x0000] = 0b01000000;
+    cpu.ExecADC(0x0000, false);
 
     EXPECT_EQ(0b10000000, cpu.A);
     EXPECT_EQ(0, cpu.C);
@@ -164,8 +164,8 @@ TEST(CPUTest, ADC) {
     // overflow AND carry
     cpu.A = 0b10000000;
     cpu.C = 0;
-    mem.RAM[0x0000] = 0b10000000;
-    cpu._adc(0x0000, false);
+    mem->RAM[0x0000] = 0b10000000;
+    cpu.ExecADC(0x0000, false);
 
     EXPECT_EQ(0, cpu.A);
     EXPECT_EQ(1, cpu.C);
@@ -173,71 +173,71 @@ TEST(CPUTest, ADC) {
 }
 
 TEST(CPUTest, AND) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.A = 0b10000001;
     cpu.mem->RAM[0x0000] = 0b10000000;
 
-    cpu._and(0x0000, false);
+    cpu.ExecAND(0x0000, false);
     EXPECT_EQ(0b10000000, cpu.A);
     EXPECT_EQ(0, cpu.Z);
     EXPECT_EQ(1, cpu.N);
 }
 
 TEST(CPUTest, ASL) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
 
     // accumulator mode
     cpu.A = 0b10000001;
     cpu.C = 0b00000000;
 
-    cpu._asl(0, true);
+    cpu.ExecASL(0, true);
     EXPECT_EQ(0b00000010, cpu.A);
     EXPECT_EQ(1, cpu.C);
 
     // non accumulator mode
-    mem.RAM[0] = 0b10000001;
+    mem->RAM[0] = 0b10000001;
 
-    cpu._asl(0, false);
-    EXPECT_EQ(0b00000010, mem.RAM[0]);
+    cpu.ExecASL(0, false);
+    EXPECT_EQ(0b00000010, mem->RAM[0]);
     EXPECT_EQ(1, cpu.C);
 }
 
 TEST(CPUTest, BCC) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.C = 0;
     cpu.Cycles = 0;
 
     // page crossing
-    cpu._bcc(0x1000, false);
+    cpu.ExecBCC(0x1000, false);
     EXPECT_EQ(2, cpu.Cycles);
     EXPECT_EQ(0x1000, cpu.PC);
 
     // not page crossing
-    cpu._bcc(0x1001, false);
+    cpu.ExecBCC(0x1001, false);
     EXPECT_EQ(3, cpu.Cycles);
     EXPECT_EQ(0x1001, cpu.PC);
 }
 
 TEST(CPUTest, BIT) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.A = 0b00000001;
-    mem.RAM[0] = 0b11000000;
-    cpu._bit(0, false);
+    mem->RAM[0] = 0b11000000;
+    cpu.ExecBIT(0, false);
     EXPECT_EQ(1, cpu.Z);
     EXPECT_EQ(1, cpu.N);
     EXPECT_EQ(1, cpu.V);
 }
 
 TEST(CPUTest, CMP) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.A = 1;
-    mem.RAM[0] = 0;
-    cpu._cmp(0, false);
+    mem->RAM[0] = 0;
+    cpu.ExecCMP(0, false);
     EXPECT_EQ(1, cpu.C);
     EXPECT_EQ(0, cpu.Z);
     EXPECT_EQ(1, cpu.N);
@@ -245,98 +245,98 @@ TEST(CPUTest, CMP) {
 }
 
 TEST(CPUTest, DEC) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
-    mem.RAM[0] = 1;
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
+    mem->RAM[0] = 1;
 
-    cpu._dec(0, false);
-    EXPECT_EQ(0, mem.RAM[0]);
+    cpu.ExecDEC(0, false);
+    EXPECT_EQ(0, mem->RAM[0]);
     EXPECT_EQ(1, cpu.Z);
     EXPECT_EQ(0, cpu.N);
 }
 
 TEST(CPUTest, DEX) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.X = 100;
 
-    cpu._dex(0, false);
+    cpu.ExecDEX(0, false);
     EXPECT_EQ(99, cpu.X);
     EXPECT_EQ(1, cpu.N);
     EXPECT_EQ(0, cpu.Z);
 }
 
 TEST(CPUTest, EOR) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
-    mem.RAM[0] = 0b10000001;
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
+    mem->RAM[0] = 0b10000001;
     cpu.A   = 0b10001000;
 
-    cpu._eor(0, false);
+    cpu.ExecEOR(0, false);
     EXPECT_EQ(0b00001001, cpu.A);
     EXPECT_EQ(1, cpu.N);
     EXPECT_EQ(0, cpu.Z);
 }
 
 TEST(CPUTest, INC) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
-    mem.RAM[0] = 1;
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
+    mem->RAM[0] = 1;
 
-    cpu._inc(0, false);
-    EXPECT_EQ(2, mem.RAM[0]);
+    cpu.ExecINC(0, false);
+    EXPECT_EQ(2, mem->RAM[0]);
     EXPECT_EQ(0, cpu.Z);
     EXPECT_EQ(1, cpu.N);
 }
 
 TEST(CPUTest, JSR) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.PC = 100;
-    cpu._jsr(0, false);
+    cpu.ExecJSR(0, false);
     EXPECT_EQ(0, cpu.PC);
 }
 
 TEST(CPUTest, LDA) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
-    mem.RAM[0] = 100;
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
+    mem->RAM[0] = 100;
 
-    cpu._lda(0, false);
+    cpu.ExecLDA(0, false);
     EXPECT_EQ(100, cpu.A);
 }
 
 TEST(CPUTest, LSR) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
 
     //  accumulator mode
     cpu.A = 0b00000011;
-    cpu._lsr(0, true);
+    cpu.ExecLSR(0, true);
     EXPECT_EQ(1, cpu.C);
     EXPECT_EQ(0b00000001, cpu.A);
 
     //  non accumulator mode
-    mem.RAM[0] = 0b00000011;
-    cpu._lsr(0, false);
+    mem->RAM[0] = 0b00000011;
+    cpu.ExecLSR(0, false);
     EXPECT_EQ(1, cpu.C);
-    EXPECT_EQ(0b00000001, mem.RAM[0]);
+    EXPECT_EQ(0b00000001, mem->RAM[0]);
 }
 
 TEST(CPUTest, ORA) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
-    mem.RAM[0] = 0b00000011;
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
+    mem->RAM[0] = 0b00000011;
     cpu.A = 0b10000000;
 
 
-    cpu._ora(0, false);
+    cpu.ExecORA(0, false);
     EXPECT_EQ(0b10000011, cpu.A);
 }
 
 TEST(CPUTest, PHP) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.C = 1;
     cpu.Z = 0;
     cpu.I = 0;
@@ -348,86 +348,86 @@ TEST(CPUTest, PHP) {
     EXPECT_EQ(0b10001001, cpu.getFlag());
 
     cpu.SP = 100;
-    cpu._php(0, false);
-    EXPECT_EQ(0b10011001, mem.RAM[0x0100|100]);
+    cpu.ExecPHP(0, false);
+    EXPECT_EQ(0b10011001, mem->RAM[0x0100|100]);
     EXPECT_EQ(99, cpu.SP);
 }
 
 TEST(CPUTest, PLP) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0b10000000;
-    mem.RAM[0x100|0b10000001] = 0b00000010;
+    mem->RAM[0x100|0b10000001] = 0b00000010;
 
-    cpu._plp(0, false);
+    cpu.ExecPLP(0, false);
     EXPECT_EQ(0b00100010, cpu.getFlag());
 }
 
 TEST(CPUTest, ROL) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
 
     // accumulator mode
     cpu.A = 0b01111110;
     cpu.C = 1;
-    cpu._rol(0, true);
+    cpu.ExecROL(0, true);
     EXPECT_EQ(0b11111101, cpu.A);
 
     // non accumulator mode
-    mem.RAM[0] = 0b01111110;
+    mem->RAM[0] = 0b01111110;
     cpu.C = 1;
-    cpu._rol(0, false);
-    EXPECT_EQ(0b11111101, mem.RAM[0]);
+    cpu.ExecROL(0, false);
+    EXPECT_EQ(0b11111101, mem->RAM[0]);
 }
 
 TEST(CPUTest, ROR) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
 
     // accumulator mode
     cpu.A = 0b01111110;
     cpu.C = 1;
-    cpu._ror(0, true);
+    cpu.ExecROR(0, true);
     EXPECT_EQ(0b10111111, cpu.A);
 
     // non accumulator mode
-    mem.RAM[0] = 0b01111110;
+    mem->RAM[0] = 0b01111110;
     cpu.C = 1;
-    cpu._ror(0, false);
-    EXPECT_EQ(0b10111111, mem.RAM[0]);
+    cpu.ExecROR(0, false);
+    EXPECT_EQ(0b10111111, mem->RAM[0]);
 }
 
 TEST(CPUTest, RTI) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0;
-    mem.RAM[0b00000001|0x100] = 0b00000011;
-    cpu._rti(0, false);
+    mem->RAM[0b00000001|0x100] = 0b00000011;
+    cpu.ExecRTI(0, false);
 
     uint8_t actual = cpu.getFlag();
     EXPECT_EQ(0b00100011, actual);
 }
 
 TEST(CPUTest, RTS) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 10;
-    mem.RAM[0x100|11] = 0x55;
-    mem.RAM[0x100|12] = 0x99;
-    cpu._rts(0, false);
+    mem->RAM[0x100|11] = 0x55;
+    mem->RAM[0x100|12] = 0x99;
+    cpu.ExecRTS(0, false);
     EXPECT_EQ(12, cpu.SP);
     EXPECT_EQ(0x9956, cpu.PC);
 }
 
 TEST(CPUTest, SBC) {
-    nestake::Memory mem = nestake::Memory{};
-    nestake::Cpu cpu = nestake::Cpu(&mem);
+    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    nestake::Cpu cpu = nestake::Cpu(mem);
 
     // Neither overflow nor carry case
     cpu.A = 1;
     cpu.C = 1;
-    mem.RAM[0x0000] = 1;
-    cpu._sbc(0x0000, false);
+    mem->RAM[0x0000] = 1;
+    cpu.ExecSBC(0x0000, false);
 
     EXPECT_EQ(0, cpu.A);
     EXPECT_EQ(1, cpu.C);
@@ -436,8 +436,8 @@ TEST(CPUTest, SBC) {
     // NOT overflow BUT carry
     cpu.A = 1;
     cpu.C = 1;
-    mem.RAM[0x0000] = 2;
-    cpu._sbc(0x0000, false);
+    mem->RAM[0x0000] = 2;
+    cpu.ExecSBC(0x0000, false);
 
     EXPECT_EQ(0xFF, cpu.A);
     EXPECT_EQ(0, cpu.C);
@@ -446,8 +446,8 @@ TEST(CPUTest, SBC) {
     // NOT carry BUT overflow
     cpu.A = 0b10000000;
     cpu.C = 1;
-    mem.RAM[0x0000] = 1;
-    cpu._sbc(0x0000, false);
+    mem->RAM[0x0000] = 1;
+    cpu.ExecSBC(0x0000, false);
 
     EXPECT_EQ(0b01111111, cpu.A);
     EXPECT_EQ(1, cpu.C);
@@ -456,8 +456,8 @@ TEST(CPUTest, SBC) {
     // overflow AND carry
     cpu.A = 0b10000000;
     cpu.C = 1;
-    mem.RAM[0x0000] = 0b10000001;
-    cpu._sbc(0x0000, false);
+    mem->RAM[0x0000] = 0b10000001;
+    cpu.ExecSBC(0x0000, false);
 
     EXPECT_EQ(0xFF, cpu.A);
     EXPECT_EQ(0, cpu.C);
