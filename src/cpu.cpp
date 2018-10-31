@@ -37,7 +37,7 @@ namespace nestake {
     }
 
     // ADC instruction
-    void Cpu::_adc(uint16_t address, bool){
+    void Cpu::ExecADC(uint16_t address, bool){
         uint8_t a = A;
         uint8_t b = mem->Read(address);
         A = a + b + C;
@@ -59,25 +59,16 @@ namespace nestake {
             V = 0;
         }
     }
-    void execADC(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_adc(address, is_accumulator);
-    }
-
 
     // AND instruction
-    void Cpu::_and(uint16_t address, bool){
+    void Cpu::ExecAND(uint16_t address, bool){
         A = A & mem->Read(address);
         // set Z & N flags
         setZN(A);
     }
 
-    void execAND(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_and(address, is_accumulator);
-    }
-
-
     // ASL instruction
-    void Cpu::_asl(uint16_t address, bool is_accumulator){
+    void Cpu::ExecASL(uint16_t address, bool is_accumulator){
         if (is_accumulator) {
             C = (A >> 7) & uint8_t(1);
             A <<= 1;
@@ -91,13 +82,8 @@ namespace nestake {
         }
     }
 
-    void execASL(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_asl(address, is_accumulator);
-    }
-
-
     // BCC instruction
-    void Cpu::_bcc(uint16_t address, bool){
+    void Cpu::ExecBCC(uint16_t address, bool){
         if (C == 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -107,13 +93,8 @@ namespace nestake {
         };
     };
 
-    void execBCC(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bcc(address, is_accumulator);
-    }
-
-
     // BCS instruction
-    void Cpu::_bcs(uint16_t address, bool){
+    void Cpu::ExecBCS(uint16_t address, bool){
         if (C != 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -123,13 +104,8 @@ namespace nestake {
         }
     };
 
-    void execBCS(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bcs(address, is_accumulator);
-    }
-
-
     // BEQ instruction
-    void Cpu::_beq(uint16_t address, bool){
+    void Cpu::ExecBEQ(uint16_t address, bool){
         if (Z != 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -139,26 +115,16 @@ namespace nestake {
         }
     };
 
-    void execBEQ(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_beq(address, is_accumulator);
-    }
-
-
     // BIT operation
-    void Cpu::_bit(uint16_t address, bool){
+    void Cpu::ExecBIT(uint16_t address, bool){
         uint8_t v = mem->Read(address);
         setZ(v & A);
         V = (v >> 6) & uint8_t(1);
         setN((v >> 7) & uint8_t(1));
     };
 
-    void execBIT(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bit(address, is_accumulator);
-    }
-
-
     // BMI params
-    void Cpu::_bmi(uint16_t address, bool){
+    void Cpu::ExecBMI(uint16_t address, bool){
         if (N != 0){
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -168,13 +134,8 @@ namespace nestake {
         }
     };
 
-    void execBMI(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bmi(address, is_accumulator);
-    }
-
-
     // BNE operation
-    void Cpu::_bne(uint16_t address, bool){
+    void Cpu::ExecBNE(uint16_t address, bool){
         if (Z == 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -184,13 +145,8 @@ namespace nestake {
         }
     };
 
-    void execBNE(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bne(address, is_accumulator);
-    }
-
-
     // BPL operation
-    void Cpu::_bpl(uint16_t address, bool){
+    void Cpu::ExecBPL(uint16_t address, bool){
         if (N == 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -200,26 +156,16 @@ namespace nestake {
         }
     };
 
-    void execBPL(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bpl(address, is_accumulator);
-    }
-
-
     // BRK instruction
-    void Cpu::_brk(uint16_t address, bool is_accumulator){
+    void Cpu::ExecBRK(uint16_t address, bool is_accumulator){
         push16(PC);
-        _php(address, is_accumulator);
-        _sei(address, is_accumulator);
+        ExecPhp(address, is_accumulator);
+        ExecSei(address, is_accumulator);
         PC = read16(0xFFFE);
     };
 
-    void execBRK(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_brk(address, is_accumulator);
-    }
-
-
     // BVC instruction
-    void Cpu::_bvc(uint16_t address, bool){
+    void Cpu::ExecBVC(uint16_t address, bool){
         if (V == 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -229,13 +175,8 @@ namespace nestake {
         }
     };
 
-    void execBVC(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bvc(address, is_accumulator);
-    }
-
-
     // BVS instruction
-    void Cpu::_bvs(uint16_t address, bool){
+    void Cpu::ExecBVS(uint16_t address, bool){
         if (V != 0) {
             if (isPageCrossed(PC, address)) {
                 ++Cycles;
@@ -245,218 +186,119 @@ namespace nestake {
         }
     };
 
-    void execBVS(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_bvs(address, is_accumulator);
-    }
-
-
     // CLC instruction
-    void Cpu::_clc(uint16_t, bool){
+    void Cpu::ExecCLC(uint16_t, bool){
         C = 0;
     };
 
-    void execCLC(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_clc(address, is_accumulator);
-    }
-
-
     // CLD instruction
-    void Cpu::_cld(uint16_t, bool){
+    void Cpu::ExecCLD(uint16_t, bool){
         D = 0;
     };
 
-    void execCLD(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_cld(address, is_accumulator);
-    }
-
-
     // CLI instruction
-    void Cpu::_cli(uint16_t, bool){
+    void Cpu::ExecCLI(uint16_t, bool){
         I = 0;
     };
 
-    void execCLI(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_cli(address, is_accumulator);
-    }
-
-
     // CLV instruction
-    void Cpu::_clv(uint16_t, bool){
+    void Cpu::ExecCLV(uint16_t, bool){
         V = 0;
     };
 
-    void execCLV(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_clv(address, is_accumulator);
-    }
-
-
     // CMP instruction
-    void Cpu::_cmp(uint16_t address, bool){
+    void Cpu::ExecCMP(uint16_t address, bool){
         uint8_t v = mem->Read(address);
         compare(A, v);
     };
 
-    void execCMP(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_cmp(address, is_accumulator);
-    }
-
-
     // CPX instruction
-    void Cpu::_cpx(uint16_t address, bool){
+    void Cpu::ExecCPX(uint16_t address, bool){
         uint8_t v = mem->Read(address);
-        _cmp(X, v);
+        ExecCMP(X, v);
     };
-
-    void execCPX(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_cpx(address, is_accumulator);
-    }
 
     // CPY instruction
-    void Cpu::_cpy(uint16_t address, bool){
+    void Cpu::ExecCPY(uint16_t address, bool){
         uint8_t v = mem->Read(address);
-        _cmp(Y, v);
+        ExecCMP(Y, v);
     };
 
-    void execCPY(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_cpy(address, is_accumulator);
-    }
-
-
     // DEC instruction
-    void Cpu::_dec(uint16_t address, bool){
+    void Cpu::ExecDEC(uint16_t address, bool){
         uint8_t v = mem->Read(address) - uint8_t(1);
         mem->Write(address, v);
         setZN(v);
     };
 
-    void execDEC(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_dec(address, is_accumulator);
-    }
-
-
     // DEX instruction
-    void Cpu::_dex(uint16_t, bool){
+    void Cpu::ExecDEX(uint16_t, bool){
         --X;
         setZN(X);
     };
 
-    void execDEX(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_dex(address, is_accumulator);
-    }
-
-
     // DEY instruction
-    void Cpu::_dey(uint16_t, bool){
+    void Cpu::ExecDEY(uint16_t, bool){
         --Y;
         setZN(Y);
     };
 
-    void execDEY(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_dey(address, is_accumulator);
-    }
-
-
     // EOR instruction
-    void Cpu::_eor(uint16_t address, bool){
+    void Cpu::ExecEOR(uint16_t address, bool){
         A = A ^ mem->Read(address);
         setZN(A);
     };
 
-    void execEOR(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_eor(address, is_accumulator);
-    }
-
-
     // INC instruction
-    void Cpu::_inc(uint16_t address, bool){
+    void Cpu::ExecINC(uint16_t address, bool){
         uint8_t v = mem->Read(address) + uint8_t(1);
         mem->Write(address, v);
         setZN(v);
     };
 
-    void execINC(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_inc(address, is_accumulator);
-    }
-
-
     // INX instruction
-    void Cpu::_inx(uint16_t, bool){
+    void Cpu::ExecINX(uint16_t, bool){
         ++X;
         setZN(X);
     };
 
-    void execINX(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_inx(address, is_accumulator);
-    }
-
-
     // INY instruction
-    void Cpu::_iny(uint16_t, bool){
+    void Cpu::ExecINY(uint16_t, bool){
         ++Y;
         setZN(Y);
     };
 
-    void execINY(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_iny(address, is_accumulator);
-    }
-
-
     // JMP operation
-    void Cpu::_jmp(uint16_t address, bool){
+    void Cpu::ExecJMP(uint16_t address, bool){
         PC = address;
     };
 
-    void execJMP(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_jmp(address, is_accumulator);
-    }
-
-
     // JSR operation
-    void Cpu::_jsr(uint16_t address, bool){
+    void Cpu::ExecJSR(uint16_t address, bool){
         push16(PC - uint8_t(1));
         PC = address;
     };
 
-    void execJSR(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_jsr(address, is_accumulator);
-    }
-
-
     // LDA operation
-    void Cpu::_lda(uint16_t address, bool){
+    void Cpu::ExecLDA(uint16_t address, bool){
         A = mem->Read(address);
         setZN(A);
     };
 
-    void execLDA(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_lda(address, is_accumulator);
-    }
-
-
     // LDX operation
-    void Cpu::_ldx(uint16_t address, bool){
+    void Cpu::ExecLDX(uint16_t address, bool){
         X = mem->Read(address);
         setZN(X);
     };
 
-    void execLDX(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_ldx(address, is_accumulator);
-    }
-
-
     // LDY operation
-    void Cpu::_ldy(uint16_t address, bool){
+    void Cpu::ExecLDY(uint16_t address, bool){
         Y = mem->Read(address);
         setZN(Y);
     };
 
-    void execLDY(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_ldy(address, is_accumulator);
-    }
-
-
     // LSR operation
-    void Cpu::_lsr(uint16_t address, bool is_accumulator){
+    void Cpu::ExecLSR(uint16_t address, bool is_accumulator){
         if (is_accumulator) {
             C = A & uint8_t(1);
             A >>= 1;
@@ -470,69 +312,35 @@ namespace nestake {
         }
     };
 
-    void execLSR(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_lsr(address, is_accumulator);
-    }
-
-
-    // NOP operation
-    void execNOP(Cpu*, uint16_t, bool) {}
-
-
     // ORA operation
-    void Cpu::_ora(uint16_t address, bool){
+    void Cpu::ExecORA(uint16_t address, bool){
         A = A | mem->Read(address);
         setZN(A);
     };
 
-    void execORA(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_ora(address, is_accumulator);
-    }
-
-
     // PHA operation
-    void Cpu::_pha(uint16_t, bool){
+    void Cpu::ExecPHA(uint16_t, bool){
         push(A);
     };
 
-    void execPHA(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_pha(address, is_accumulator);
-    }
-
-
     // PHP operation
-    void Cpu::_php(uint16_t, bool){
+    void Cpu::ExecPHP(uint16_t, bool){
         push(getFlag()|uint8_t(0x10));
     };
 
-    void execPHP(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_php(address, is_accumulator);
-    }
-
-
     // PLA operation
-    void Cpu::_pla(uint16_t, bool){
+    void Cpu::ExecPLA(uint16_t, bool){
         A = pull();
         setZN(A);
     };
 
-    void execPLA(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_pla(address, is_accumulator);
-    }
-
-
     // PLP operation
-    void Cpu::_plp(uint16_t, bool){
+    void Cpu::ExecPLP(uint16_t, bool){
         setFlags((pull()&uint8_t(0xEF))| uint8_t(0x20));
     };
 
-    void execPLP(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_plp(address, is_accumulator);
-    }
-
-
     // ROL operation
-    void Cpu::_rol(uint16_t address, bool is_accumulator){
+    void Cpu::ExecROL(uint16_t address, bool is_accumulator){
         if (is_accumulator) {
             uint8_t prev_c = C;
             C = (A >> 7) & uint8_t(1);
@@ -548,13 +356,8 @@ namespace nestake {
         }
     };
 
-    void execROL(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_rol(address, is_accumulator);
-    }
-
-
     // ROR operation
-    void Cpu::_ror(uint16_t address, bool is_accumulator){
+    void Cpu::ExecROR(uint16_t address, bool is_accumulator){
         if (is_accumulator) {
             uint8_t prev_c = C;
             C = A & uint8_t(1);
@@ -570,34 +373,19 @@ namespace nestake {
         }
     };
 
-    void execROR(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_ror(address, is_accumulator);
-    }
-
-
     // RTI operation
-    void Cpu::_rti(uint16_t, bool){
+    void Cpu::ExecRTI(uint16_t, bool){
         setFlags((pull()&uint8_t(0xEF))| uint8_t(0x20));
         PC = pull16();
     };
 
-    void execRTI(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_rti(address, is_accumulator);
-    }
-
-
     // RTS operation
-    void Cpu::_rts(uint16_t, bool){
+    void Cpu::ExecRTS(uint16_t, bool){
         PC = pull16() + uint16_t(1);
     };
 
-    void execRTS(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_rts(address, is_accumulator);
-    }
-
-
     // SBC operation
-    void Cpu::_sbc(uint16_t address, bool){
+    void Cpu::ExecSBC(uint16_t address, bool){
         uint8_t prev_a = A;
         uint8_t b = mem->Read(address);
         uint8_t prev_c = C;
@@ -618,134 +406,72 @@ namespace nestake {
         }
     };
 
-    void execSBC(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_sbc(address, is_accumulator);
-    }
-
     // SEC operation
-    void Cpu::_sec(uint16_t, bool){
+    void Cpu::ExecSEC(uint16_t, bool){
         C = 1;
     };
 
-    void execSEC(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_sec(address, is_accumulator);
-    }
-
-
     // SED operation
-    void Cpu::_sed(uint16_t, bool){
+    void Cpu::ExecSED(uint16_t, bool){
         D = 1;
     };
 
-    void execSED(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_sed(address, is_accumulator);
-    }
-
-
     // SEI operation
-    void Cpu::_sei(uint16_t, bool){
+    void Cpu::ExecSEI(uint16_t, bool){
         I = 1;
     };
 
-    void execSEI(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_sei(address, is_accumulator);
-    }
-
-
     // STA operation
-    void Cpu::_sta(uint16_t address, bool){
+    void Cpu::ExecSTA(uint16_t address, bool){
         mem->Write(address, A);
     };
 
-    void execSTA(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_sta(address, is_accumulator);
-    }
-
-
     // STX operation
-    void Cpu::_stx(uint16_t address, bool){
+    void Cpu::ExecSTX(uint16_t address, bool){
         mem->Write(address, X);
     };
 
-    void execSTX(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_stx(address, is_accumulator);
-    }
-
-
     // STY operation
-    void Cpu::_sty(uint16_t address, bool){
+    void Cpu::ExecSTY(uint16_t address, bool){
         mem->Write(address, Y);
     };
 
-    void execSTY(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_sty(address, is_accumulator);
-    }
-
-
     // TAX operation
-    void Cpu::_tax(uint16_t, bool){
+    void Cpu::ExecTAX(uint16_t, bool){
         X = A;
         setZN(X);
     };
 
-    void execTAX(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_tax(address, is_accumulator);
-    }
-
-
     // TAY operation
-    void Cpu::_tay(uint16_t, bool){
+    void Cpu::ExecTAY(uint16_t, bool){
         Y = A;
         setZN(Y);
     };
 
-    void execTAY(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_tay(address, is_accumulator);
-    }
-
-
     // TSX operation
-    void Cpu::_tsx(uint16_t, bool){
+    void Cpu::ExecTSX(uint16_t, bool){
         X = SP;
         setZN(X);
     };
 
-    void execTSX(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_tsx(address, is_accumulator);
-    }
-
 
     // TXA operation
-    void Cpu::_txa(uint16_t, bool){
+    void Cpu::ExecTXA(uint16_t, bool){
         A = X;
         setZN(A);
     };
 
-    void execTXA(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_txa(address, is_accumulator);
-    }
-
-
     // TXS operation
-    void Cpu::_txs(uint16_t, bool){
+    void Cpu::ExecTXS(uint16_t, bool){
         SP = X;
     };
 
-    void execTXS(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_txs(address, is_accumulator);
-    }
-
 
     // TYA operation
-    void Cpu::_tya(uint16_t, bool){
+    void Cpu::ExecTYA(uint16_t, bool){
         A = Y;
         setZN(A);
     };
-
-    void execTYA(Cpu *cpu, uint16_t address, bool is_accumulator) {
-        cpu->_tya(address, is_accumulator);
-    }
-
 
     uint16_t Cpu::read16(uint16_t address) {
         uint16_t lo = mem->Read(address);
@@ -869,7 +595,7 @@ namespace nestake {
 
     void Cpu::irq() {
         push16(PC);
-        _php(0, false);
+        ExecPHP(0, false);
         PC = read16(0xFFFE);
         I = 1;
         Cycles += 7;
@@ -976,7 +702,7 @@ namespace nestake {
             Cycles += inst.PageCycle;
         }
 
-        inst.executor(this, address, inst.AddressingMode == Accumulator);
+        inst.executor(address, inst.AddressingMode == Accumulator);
 
         if (IsDebugMode) {
             cout << "[Instruction]:" << idToInstructionName.find(inst.ID)->second;
@@ -987,6 +713,7 @@ namespace nestake {
         return Cycles - prev_cycles;
     }
 
+    // [&](uint16_t a, bool b){_php(a, b);}
     Cpu::Cpu(std::shared_ptr<Memory> m) {
         // setup instruction table
         // ref: http://pgate1.at-ninja.jp/NES_on_FPGA/nes_cpu.htm#instruction
@@ -1090,46 +817,46 @@ namespace nestake {
             {0xB8, {CLV, Implied, 1, 2, 0, execCLV}},
 
             // LDA
-            {0xA9, {LDA, Immediate, 2, 2, 0, execLDA}}, {0xA5, {LDA, ZeroPage, 2, 3, 0, execLDA}},
-            {0xB5, {LDA, ZeroPageX, 2, 4, 0, execLDA}}, {0xAD, {LDA, Absolute, 3, 4, 0, execLDA}},
-            {0xBD, {LDA, AbsoluteX, 3, 4, 1, execLDA}}, {0xB9, {LDA, AbsoluteY, 3, 4, 1, execLDA}},
-            {0xA9, {LDA, IndexedIndirect, 2, 6, 0, execLDA}}, {0xB1, {LDA, IndirectIndexed, 2, 5, 1, execLDA}},
+            {0xA9, {LDA, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecLDA(a,b);}}}, {0xA5, {LDA, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecLDA(a,b);}}},
+            {0xB5, {LDA, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecLDA(a,b);}}}, {0xAD, {LDA, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecLDA(a,b);}}},
+            {0xBD, {LDA, AbsoluteX, 3, 4, 1, [&](uint16_t a, bool b){ExecLDA(a,b);}}}, {0xB9, {LDA, AbsoluteY, 3, 4, 1, [&](uint16_t a, bool b){ExecLDA(a,b);}}},
+            {0xA9, {LDA, IndexedIndirect, 2, 6, 0, [&](uint16_t a, bool b){ExecLDA(a,b);}}}, {0xB1, {LDA, IndirectIndexed, 2, 5, 1, [&](uint16_t a, bool b){ExecLDA(a,b);}}},
 
             // LDX
-            {0xA2, {LDX, Immediate, 2, 2, 0, execLDX}}, {0xA6, {LDX, ZeroPage, 2, 3, 0, execLDX}},
-            {0xB6, {LDX, ZeroPageY, 2, 4, 0, execLDX}}, {0xAE, {LDX, Absolute, 3, 4, 0, execLDX}},
-            {0xBE, {LDX, AbsoluteY, 3, 4, 1, execLDX}},
+            {0xA2, {LDX, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecLDX(a,b);}}}, {0xA6, {LDX, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecLDX(a,b);}}},
+            {0xB6, {LDX, ZeroPageY, 2, 4, 0, [&](uint16_t a, bool b){ExecLDX(a,b);}}}, {0xAE, {LDX, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecLDX(a,b);}}},
+            {0xBE, {LDX, AbsoluteY, 3, 4, 1, [&](uint16_t a, bool b){ExecLDX(a,b);}}},
 
             // LDY
-            {0xA0, {LDY, Immediate, 2, 2, 0, execLDY}}, {0xA4, {LDY, ZeroPage, 2, 3, 0, execLDY}},
-            {0xB4, {LDY, ZeroPageX, 2, 4, 0, execLDY}}, {0xAC, {LDY, Absolute, 3, 4, 0, execLDY}},
-            {0xBC, {LDY, AbsoluteX, 3, 4, 1, execLDY}},
+            {0xA0, {LDY, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecLDY(a,b);}}}, {0xA4, {LDY, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecLDY(a,b);}}},
+            {0xB4, {LDY, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecLDY(a,b);}}}, {0xAC, {LDY, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecLDY(a,b);}}},
+            {0xBC, {LDY, AbsoluteX, 3, 4, 1, [&](uint16_t a, bool b){ExecLDY(a,b);}}},
 
             // STA
-            {0x85, {STA, ZeroPage, 2, 3, 0, execSTA}}, {0x95, {LDA, ZeroPageX, 2, 4, 0, execSTA}},
-            {0x8D, {STA, Absolute, 3, 4, 0, execSTA}}, {0x9D, {LDA, AbsoluteX, 3, 4, 1, execSTA}},
-            {0x99, {STA, AbsoluteY, 3, 4, 1, execSTA}}, {0x81, {LDA, IndexedIndirect, 2, 6,01, execSTA}},
-            {0x91, {STA, IndirectIndexed, 2, 5, 1, execSTA}},
+            {0x85, {STA, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecSTA(a,b);}}}, {0x95, {LDA, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecSTA(a,b);}}},
+            {0x8D, {STA, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecSTA(a,b);}}}, {0x9D, {LDA, AbsoluteX, 3, 4, 1, [&](uint16_t a, bool b){ExecSTA(a,b);}}},
+            {0x99, {STA, AbsoluteY, 3, 4, 1, [&](uint16_t a, bool b){ExecSTA(a,b);}}}, {0x81, {LDA, IndexedIndirect, 2, 6,01, [&](uint16_t a, bool b){ExecSTA(a,b);}}},
+            {0x91, {STA, IndirectIndexed, 2, 5, 1, [&](uint16_t a, bool b){ExecSTA(a,b);}}},
 
             // STX
-            {0x86, {STX, ZeroPage, 2, 3, 0, execSTX}}, {0x96, {STX, ZeroPageX, 2, 4, 0, execSTX}},
-            {0x8E, {STX, Absolute, 3, 4, 0, execSTX}},
+            {0x86, {STX, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecSTX(a,b);}}}, {0x96, {STX, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecSTX(a,b);}}},
+            {0x8E, {STX, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecSTX(a,b);}}},
 
             // STY
-            {0x84, {STY, ZeroPage, 2, 3, 0, execSTY}}, {0x94, {STY, ZeroPageX, 2, 4, 0, execSTY}},
-            {0x8C, {STY, Absolute, 3, 4, 0, execSTY}},
+            {0x84, {STY, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecSTY(a,b);}}}, {0x94, {STY, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecSTY(a,b);}}},
+            {0x8C, {STY, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecSTY(a,b);}}},
 
             // transfer related
-            {0xAA, {TAX, Implied, 1, 2, 0, execTAX}}, {0x8A, {TXA, Implied, 1, 2, 0, execTXA}},
-            {0xA8, {TAY, Implied, 1, 2, 0, execTAY}}, {0x98, {TYA, Implied, 1, 2, 0, execTYA}},
-            {0x9A, {TXS, Implied, 1, 2, 0, execTXS}}, {0xBA, {TSX, Implied, 1, 2, 0, execTSX}},
+            {0xAA, {TAX, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecTAX(a,b);}}}, {0x8A, {TXA, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecTXA(a,b);}}},
+            {0xA8, {TAY, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecTAY(a,b);}}}, {0x98, {TYA, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecTYA(a,b);}}},
+            {0x9A, {TXS, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecTXS(a,b);}}}, {0xBA, {TSX, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecTSX(a,b);}}},
 
             // push related
-            {0x48, {PHA, Implied, 1, 3, 0, execPHA}}, {0x68, {PLA, Implied, 1, 4, 0, execPLA}},
-            {0x08, {PHP, Implied, 1, 3, 0, execPHP}}, {0x28, {PLP, Implied, 1, 4, 0, execPLP}},
+            {0x48, {PHA, Implied, 1, 3, 0, [&](uint16_t a, bool b){ExecPHA(a,b);}}},{0x68, {PLA, Implied, 1, 4, 0, [&](uint16_t a, bool b){ExecPLA(a,b);}}},
+            {0x08, {PHP, Implied, 1, 3, 0, [&](uint16_t a, bool b){ExecPHP(a,b);}}}, {0x28, {PLP, Implied, 1, 4, 0, [&](uint16_t a, bool b){ExecPLP(a,b);}}},
 
             // NOP
-            {0xEA, {NOP, Implied, 1, 2, 0, execNOP}}
+            {0xEA, {NOP, Implied, 1, 2, 0, [&](uint16_t a, bool b){}}}
         };
 
         // debugging purpose

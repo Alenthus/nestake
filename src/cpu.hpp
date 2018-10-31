@@ -100,68 +100,65 @@ namespace nestake {
         void TriggerNMI();
 
         // instructions
-        void _adc(uint16_t, bool);
-        void _and(uint16_t, bool);
-        void _asl(uint16_t, bool);
-        void _bcc(uint16_t, bool);
-        void _bcs(uint16_t, bool);
-        void _beq(uint16_t, bool);
-        void _bit(uint16_t, bool);
-        void _bmi(uint16_t, bool);
-        void _bne(uint16_t, bool);
-        void _bpl(uint16_t, bool);
-        void _brk(uint16_t, bool);
-        void _bvc(uint16_t, bool);
-        void _bvs(uint16_t, bool);
-        void _clc(uint16_t, bool);
-        void _cld(uint16_t, bool);
-        void _cli(uint16_t, bool);
-        void _clv(uint16_t, bool);
-        void _cmp(uint16_t, bool);
-        void _cpx(uint16_t, bool);
-        void _cpy(uint16_t, bool);
-        void _dec(uint16_t, bool);
-        void _dex(uint16_t, bool);
-        void _dey(uint16_t, bool);
-        void _eor(uint16_t, bool);
-        void _inc(uint16_t, bool);
-        void _inx(uint16_t, bool);
-        void _iny(uint16_t, bool);
-        void _jmp(uint16_t, bool);
-        void _jsr(uint16_t, bool);
-        void _lda(uint16_t, bool);
-        void _ldx(uint16_t, bool);
-        void _ldy(uint16_t, bool);
-        void _lsr(uint16_t, bool);
-        void _ora(uint16_t, bool);
-        void _pha(uint16_t, bool);
-        void _php(uint16_t, bool);
-        void _pla(uint16_t, bool);
-        void _plp(uint16_t, bool);
-        void _rol(uint16_t, bool);
-        void _ror(uint16_t, bool);
-        void _rti(uint16_t, bool);
-        void _rts(uint16_t, bool);
-        void _sbc(uint16_t, bool);
-        void _sec(uint16_t, bool);
-        void _sed(uint16_t, bool);
-        void _sei(uint16_t, bool);
-        void _sta(uint16_t, bool);
-        void _stx(uint16_t, bool);
-        void _sty(uint16_t, bool);
-        void _tax(uint16_t, bool);
-        void _tay(uint16_t, bool);
-        void _tsx(uint16_t, bool);
-        void _txa(uint16_t, bool);
-        void _txs(uint16_t, bool);
-        void _tya(uint16_t, bool);
+        void ExecADC(uint16_t, bool);
+        void ExecAND(uint16_t, bool);
+        void ExecASL(uint16_t, bool);
+        void ExecBCC(uint16_t, bool);
+        void ExecBCS(uint16_t, bool);
+        void ExecBEQ(uint16_t, bool);
+        void ExecBIT(uint16_t, bool);
+        void ExecBMI(uint16_t, bool);
+        void ExecBNE(uint16_t, bool);
+        void ExecBPL(uint16_t, bool);
+        void ExecBRK(uint16_t, bool);
+        void ExecBVC(uint16_t, bool);
+        void ExecBVS(uint16_t, bool);
+        void ExecCLC(uint16_t, bool);
+        void ExecCLD(uint16_t, bool);
+        void ExecCLI(uint16_t, bool);
+        void ExecCLV(uint16_t, bool);
+        void ExecCMP(uint16_t, bool);
+        void ExecCPX(uint16_t, bool);
+        void ExecCPY(uint16_t, bool);
+        void ExecDEC(uint16_t, bool);
+        void ExecDEX(uint16_t, bool);
+        void ExecDEY(uint16_t, bool);
+        void ExecEOR(uint16_t, bool);
+        void ExecINC(uint16_t, bool);
+        void ExecINX(uint16_t, bool);
+        void ExecINY(uint16_t, bool);
+        void ExecJMP(uint16_t, bool);
+        void ExecJSR(uint16_t, bool);
+        void ExecLDA(uint16_t, bool);
+        void ExecLDX(uint16_t, bool);
+        void ExecLDY(uint16_t, bool);
+        void ExecLSR(uint16_t, bool);
+        void ExecORA(uint16_t, bool);
+        void ExecPHA(uint16_t, bool);
+        void ExecPHP(uint16_t, bool);
+        void ExecPLA(uint16_t, bool);
+        void ExecPLP(uint16_t, bool);
+        void ExecROL(uint16_t, bool);
+        void ExecROR(uint16_t, bool);
+        void ExecRTI(uint16_t, bool);
+        void ExecRTS(uint16_t, bool);
+        void ExecSBC(uint16_t, bool);
+        void ExecSEC(uint16_t, bool);
+        void ExecSED(uint16_t, bool);
+        void ExecSEI(uint16_t, bool);
+        void ExecSTA(uint16_t, bool);
+        void ExecSTX(uint16_t, bool);
+        void ExecSTY(uint16_t, bool);
+        void ExecTAX(uint16_t, bool);
+        void ExecTAY(uint16_t, bool);
+        void ExecTSX(uint16_t, bool);
+        void ExecTXA(uint16_t, bool);
+        void ExecTXS(uint16_t, bool);
+        void ExecTYA(uint16_t, bool);
 
         // setup (instruction table)
         explicit Cpu(std::shared_ptr<Memory>);
     };
-
-    // interface of instruction executor
-    typedef void (*InstructionExecutor) (Cpu *cpu, uint16_t address, bool is_accumulator);
 
     // struct consisting of information for instruction execution
     struct InstructionParams {
@@ -180,7 +177,7 @@ namespace nestake {
         // the number of page cycles used by the instruction
         uint8_t PageCycle;
 
-        InstructionExecutor executor;
+        std::function<void (uint16_t, bool)> executor;
     };
 
     // map of all instructions
