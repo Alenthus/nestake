@@ -159,8 +159,8 @@ namespace nestake {
     // BRK instruction
     void Cpu::ExecBRK(uint16_t address, bool is_accumulator){
         push16(PC);
-        ExecPhp(address, is_accumulator);
-        ExecSei(address, is_accumulator);
+        ExecPHP(address, is_accumulator);
+        ExecSEI(address, is_accumulator);
         PC = read16(0xFFFE);
     };
 
@@ -603,7 +603,7 @@ namespace nestake {
 
     void Cpu::nmi() {
         push16(PC);
-        _php(0, false);
+        ExecPHP(0, false);
         PC = read16(0xFFFA);
         I = 1;
         Cycles += 7;
@@ -719,102 +719,102 @@ namespace nestake {
         // ref: http://pgate1.at-ninja.jp/NES_on_FPGA/nes_cpu.htm#instruction
         InstructionTable = {
             // ADC
-            {0x69, {ADC, Immediate, 2, 2, 0, execADC}}, {0x65, {ADC, ZeroPage, 2, 3, 0, execADC}},
-            {0x75, {ADC, ZeroPageX, 2, 4, 0, execADC}}, {0x6D, {ADC, Absolute, 3, 4, 0, execADC}},
-            {0x7D, {ADC, AbsoluteX, 3, 4, 1, execADC}}, {0x79, {ADC, AbsoluteY, 3, 4, 1, execADC}},
-            {0x79, {ADC, IndexedIndirect, 2, 6, 0, execADC}}, {0x71, {ADC, IndirectIndexed, 2, 5, 1, execADC}},
+            {0x69, {ADC, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecADC(a,b);}}}, {0x65, {ADC, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecADC(a,b);}}},
+            {0x75, {ADC, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecADC(a,b);}}}, {0x6D, {ADC, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecADC(a,b);}}},
+            {0x7D, {ADC, AbsoluteX, 3, 4, 1, [&](uint16_t a, bool b){ExecADC(a,b);}}}, {0x79, {ADC, AbsoluteY, 3, 4, 1, [&](uint16_t a, bool b){ExecADC(a,b);}}},
+            {0x79, {ADC, IndexedIndirect, 2, 6, 0, [&](uint16_t a, bool b){ExecADC(a,b);}}}, {0x71, {ADC, IndirectIndexed, 2, 5, 1, [&](uint16_t a, bool b){ExecADC(a,b);}}},
 
             // SBC
-            {0xE9, {SBC, Immediate, 2, 2, 0, execSBC}}, {0xE5, {SBC, ZeroPage, 2, 3, 0, execSBC}},
-            {0xF5, {SBC, ZeroPageX, 2, 4, 0, execSBC}}, {0xED, {SBC, Absolute, 3, 4, 0, execSBC}},
-            {0xFD, {SBC, AbsoluteX, 3, 4, 1, execSBC}}, {0xF9, {SBC, AbsoluteY, 3, 4, 1, execSBC}},
-            {0xE1, {SBC, IndexedIndirect, 2, 6, 0, execSBC}}, {0xF1, {SBC, IndirectIndexed, 2, 5, 1, execSBC}},
+            {0xE9, {SBC, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecSBC(a,b);}}}, {0xE5, {SBC, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecSBC(a,b);}}},
+            {0xF5, {SBC, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecSBC(a,b);}}}, {0xED, {SBC, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecSBC(a,b);}}},
+            {0xFD, {SBC, AbsoluteX, 3, 4, 1, [&](uint16_t a, bool b){ExecSBC(a,b);}}}, {0xF9, {SBC, AbsoluteY, 3, 4, 1, [&](uint16_t a, bool b){ExecSBC(a,b);}}},
+            {0xE1, {SBC, IndexedIndirect, 2, 6, 0, [&](uint16_t a, bool b){ExecSBC(a,b);}}}, {0xF1, {SBC, IndirectIndexed, 2, 5, 1, [&](uint16_t a, bool b){ExecSBC(a,b);}}},
 
             // AND
-            {0x29, {AND, Immediate, 2, 2, 0, execAND}}, {0x25, {AND, ZeroPage, 2, 3, 0, execAND}},
-            {0x35, {AND, ZeroPageX, 2, 4, 0, execAND}}, {0x2D, {AND, Absolute, 3, 4, 0, execAND}},
-            {0x3D, {AND, AbsoluteX, 3, 4, 1, execAND}}, {0x39, {AND, AbsoluteY, 3, 4, 1, execAND}},
-            {0x21, {AND, IndexedIndirect, 2, 6, 0, execAND}}, {0x31, {AND, IndirectIndexed, 2, 5, 1, execAND}},
+            {0x29, {AND, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecAND(a,b);}}}, {0x25, {AND, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecAND(a,b);}}},
+            {0x35, {AND, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecAND(a,b);}}}, {0x2D, {AND, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecAND(a,b);}}},
+            {0x3D, {AND, AbsoluteX, 3, 4, 1, [&](uint16_t a, bool b){ExecAND(a,b);}}}, {0x39, {AND, AbsoluteY, 3, 4, 1, [&](uint16_t a, bool b){ExecAND(a,b);}}},
+            {0x21, {AND, IndexedIndirect, 2, 6, 0, [&](uint16_t a, bool b){ExecAND(a,b);}}}, {0x31, {AND, IndirectIndexed, 2, 5, 1, [&](uint16_t a, bool b){ExecAND(a,b);}}},
 
             // ORA
-            {0x09, {ORA, Immediate, 2, 2, 0, execORA}}, {0x05, {ORA, ZeroPage, 2, 3, 0, execORA}},
-            {0x15, {ORA, ZeroPageX, 2, 4, 0, execORA}}, {0x0D, {ORA, Absolute, 3, 4, 0, execORA}},
-            {0x1D, {ORA, AbsoluteX, 3, 4, 1, execORA}}, {0x19, {ORA, AbsoluteY, 3, 4, 1, execORA}},
-            {0x01, {ORA, IndexedIndirect, 2, 6, 0, execORA}}, {0x11, {ORA, IndirectIndexed, 2, 5, 1, execORA}},
+            {0x09, {ORA, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecORA(a,b);}}}, {0x05, {ORA, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecORA(a,b);}}},
+            {0x15, {ORA, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecORA(a,b);}}}, {0x0D, {ORA, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecORA(a,b);}}},
+            {0x1D, {ORA, AbsoluteX, 3, 4, 1, [&](uint16_t a, bool b){ExecORA(a,b);}}}, {0x19, {ORA, AbsoluteY, 3, 4, 1, [&](uint16_t a, bool b){ExecORA(a,b);}}},
+            {0x01, {ORA, IndexedIndirect, 2, 6, 0, [&](uint16_t a, bool b){ExecORA(a,b);}}}, {0x11, {ORA, IndirectIndexed, 2, 5, 1, [&](uint16_t a, bool b){ExecORA(a,b);}}},
 
             // EOR
-            {0x49, {EOR, Immediate, 2, 2, 0, execEOR}}, {0x45, {EOR, ZeroPage, 2, 3, 0, execEOR}},
-            {0x55, {EOR, ZeroPageX, 2, 4, 0, execEOR}}, {0x4D, {EOR, Absolute, 3, 4, 0, execEOR}},
-            {0x5D, {EOR, AbsoluteX, 3, 4, 1, execEOR}}, {0x59, {EOR, AbsoluteY, 3, 4, 1, execEOR}},
-            {0x41, {EOR, IndexedIndirect, 2, 6, 0, execEOR}}, {0x51, {EOR, IndirectIndexed, 2, 5, 1, execEOR}},
+            {0x49, {EOR, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecEOR(a,b);}}}, {0x45, {EOR, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecEOR(a,b);}}},
+            {0x55, {EOR, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecEOR(a,b);}}}, {0x4D, {EOR, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecEOR(a,b);}}},
+            {0x5D, {EOR, AbsoluteX, 3, 4, 1, [&](uint16_t a, bool b){ExecEOR(a,b);}}}, {0x59, {EOR, AbsoluteY, 3, 4, 1, [&](uint16_t a, bool b){ExecEOR(a,b);}}},
+            {0x41, {EOR, IndexedIndirect, 2, 6, 0, [&](uint16_t a, bool b){ExecEOR(a,b);}}}, {0x51, {EOR, IndirectIndexed, 2, 5, 1, [&](uint16_t a, bool b){ExecEOR(a,b);}}},
 
             // ASL
-            {0x0A, {ASL, Accumulator, 1, 2, 0, execASL}}, {0x06, {ASL, ZeroPage, 2, 5, 0, execASL}},
-            {0x16, {ASL, ZeroPageX, 2, 6, 0, execASL}}, {0x0E, {ASL, Absolute, 3, 6, 0, execASL}},
-            {0x1E, {ASL, AbsoluteX, 3, 6, 1, execASL}},
+            {0x0A, {ASL, Accumulator, 1, 2, 0, [&](uint16_t a, bool b){ExecASL(a,b);}}}, {0x06, {ASL, ZeroPage, 2, 5, 0, [&](uint16_t a, bool b){ExecASL(a,b);}}},
+            {0x16, {ASL, ZeroPageX, 2, 6, 0, [&](uint16_t a, bool b){ExecASL(a,b);}}}, {0x0E, {ASL, Absolute, 3, 6, 0, [&](uint16_t a, bool b){ExecASL(a,b);}}},
+            {0x1E, {ASL, AbsoluteX, 3, 6, 1, [&](uint16_t a, bool b){ExecASL(a,b);}}},
 
             // LSR
-            {0x4A, {LSR, Accumulator, 1, 2, 0, execLSR}}, {0x46, {LSR, ZeroPage, 2, 5, 0, execLSR}},
-            {0x56, {LSR, ZeroPageX, 2, 6, 0, execLSR}}, {0x4E, {LSR, Absolute, 3, 6, 0, execLSR}},
-            {0x5E, {LSR, AbsoluteX, 3, 6, 1, execLSR}},
+            {0x4A, {LSR, Accumulator, 1, 2, 0, [&](uint16_t a, bool b){ExecLSR(a,b);}}}, {0x46, {LSR, ZeroPage, 2, 5, 0, [&](uint16_t a, bool b){ExecLSR(a,b);}}},
+            {0x56, {LSR, ZeroPageX, 2, 6, 0, [&](uint16_t a, bool b){ExecLSR(a,b);}}}, {0x4E, {LSR, Absolute, 3, 6, 0, [&](uint16_t a, bool b){ExecLSR(a,b);}}},
+            {0x5E, {LSR, AbsoluteX, 3, 6, 1, [&](uint16_t a, bool b){ExecLSR(a,b);}}},
 
             // ROL
-            {0x2A, {ROL, Accumulator, 1, 2, 0, execROL}}, {0x26, {ROL, ZeroPage, 2, 5, 0, execROL}},
-            {0x36, {ROL, ZeroPageX, 2, 6, 0, execROL}}, {0x2E, {ROL, Absolute, 3, 6, 0, execROL}},
-            {0x3E, {ROL, AbsoluteX, 3, 6, 1, execROL}},
+            {0x2A, {ROL, Accumulator, 1, 2, 0, [&](uint16_t a, bool b){ExecROL(a,b);}}}, {0x26, {ROL, ZeroPage, 2, 5, 0, [&](uint16_t a, bool b){ExecROL(a,b);}}},
+            {0x36, {ROL, ZeroPageX, 2, 6, 0, [&](uint16_t a, bool b){ExecROL(a,b);}}}, {0x2E, {ROL, Absolute, 3, 6, 0, [&](uint16_t a, bool b){ExecROL(a,b);}}},
+            {0x3E, {ROL, AbsoluteX, 3, 6, 1, [&](uint16_t a, bool b){ExecROL(a,b);}}},
 
             // ROR
-            {0x6A, {ROR, Accumulator, 1, 2, 0, execROR}}, {0x66, {ROR, ZeroPage, 2, 5, 0, execROR}},
-            {0x76, {ROR, ZeroPageX, 2, 6, 0, execROR}}, {0x6E, {ROR, Absolute, 3, 6, 0, execROR}},
-            {0x7E, {ROR, AbsoluteX, 3, 6, 1, execROR}},
+            {0x6A, {ROR, Accumulator, 1, 2, 0, [&](uint16_t a, bool b){ExecROR(a,b);}}}, {0x66, {ROR, ZeroPage, 2, 5, 0, [&](uint16_t a, bool b){ExecROR(a,b);}}},
+            {0x76, {ROR, ZeroPageX, 2, 6, 0, [&](uint16_t a, bool b){ExecROR(a,b);}}}, {0x6E, {ROR, Absolute, 3, 6, 0, [&](uint16_t a, bool b){ExecROR(a,b);}}},
+            {0x7E, {ROR, AbsoluteX, 3, 6, 1, [&](uint16_t a, bool b){ExecROR(a,b);}}},
 
             // Relatives
-            {0x90, {BCC, Relative, 2, 2, 1, execBCC}}, {0xB0, {BCS, Relative, 2, 2, 1, execBCS}},
-            {0xF0, {BEQ, Relative, 2, 2, 1, execBEQ}}, {0xD0, {BNE, Relative, 2, 2, 1, execBNE}},
-            {0x50, {BVC, Relative, 2, 2, 1, execBVC}}, {0x70, {BVS, Relative, 2, 2, 1, execBVS}},
-            {0x10, {BPL, Relative, 2, 2, 1, execBPL}}, {0x30, {BMI, Relative, 2, 2, 1, execBMI}},
+            {0x90, {BCC, Relative, 2, 2, 1, [&](uint16_t a, bool b){ExecBCC(a,b);}}}, {0xB0, {BCS, Relative, 2, 2, 1, [&](uint16_t a, bool b){ExecBCS(a,b);}}},
+            {0xF0, {BEQ, Relative, 2, 2, 1, [&](uint16_t a, bool b){ExecBEQ(a,b);}}}, {0xD0, {BNE, Relative, 2, 2, 1, [&](uint16_t a, bool b){ExecBNE(a,b);}}},
+            {0x50, {BVC, Relative, 2, 2, 1, [&](uint16_t a, bool b){ExecBVC(a,b);}}}, {0x70, {BVS, Relative, 2, 2, 1, [&](uint16_t a, bool b){ExecBVS(a,b);}}},
+            {0x10, {BPL, Relative, 2, 2, 1, [&](uint16_t a, bool b){ExecBPL(a,b);}}}, {0x30, {BMI, Relative, 2, 2, 1, [&](uint16_t a, bool b){ExecBMI(a,b);}}},
 
             // BIT
-            {0x24, {BIT, ZeroPage, 2, 3, 0, execBIT}}, {0x2C, {BIT, Absolute, 3, 4, 0, execBIT}},
+            {0x24, {BIT, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecBIT(a,b);}}}, {0x2C, {BIT, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecBIT(a,b);}}},
 
             // JMP
-            {0x4C, {JMP, Absolute, 3, 3, 0, execJMP}}, {0x6C, {JMP, Indirect, 3, 5, 0, execJMP}},
+            {0x4C, {JMP, Absolute, 3, 3, 0, [&](uint16_t a, bool b){ExecJMP(a,b);}}}, {0x6C, {JMP, Indirect, 3, 5, 0, [&](uint16_t a, bool b){ExecJMP(a,b);}}},
 
             // JSR / RTS / BRK / RTI
-            {0x20, {JSR, Absolute, 3, 6, 0, execJSR}}, {0x60, {RTS, Implied, 1, 6, 0, execRTS}},
-            {0x00, {BRK, Implied, 1, 7, 0, execBRK}}, {0x40, {RTI, Implied, 1, 6, 0, execRTI}},
+            {0x20, {JSR, Absolute, 3, 6, 0, [&](uint16_t a, bool b){ExecJSR(a,b);}}}, {0x60, {RTS, Implied, 1, 6, 0, [&](uint16_t a, bool b){ExecRTS(a,b);}}},
+            {0x00, {BRK, Implied, 1, 7, 0, [&](uint16_t a, bool b){ExecBRK(a,b);}}}, {0x40, {RTI, Implied, 1, 6, 0, [&](uint16_t a, bool b){ExecRTI(a,b);}}},
 
             // CMP
-            {0xC9, {CMP, Immediate, 2, 2, 0, execCMP}}, {0xC5, {CMP, ZeroPage, 2, 3, 0, execCMP}},
-            {0xD5, {CMP, ZeroPageX, 2, 4, 0, execCMP}}, {0xCD, {CMP, Absolute, 3, 4, 0, execCMP}},
-            {0xDD, {CMP, AbsoluteX, 3, 4, 1, execCMP}}, {0xD9, {CMP, AbsoluteY, 3, 4, 1, execCMP}},
-            {0xC1, {CMP, IndexedIndirect, 2, 6, 0, execCMP}}, {0xD1, {CMP, IndirectIndexed, 2, 5, 1, execCMP}},
+            {0xC9, {CMP, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecCMP(a,b);}}}, {0xC5, {CMP, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecCMP(a,b);}}},
+            {0xD5, {CMP, ZeroPageX, 2, 4, 0, [&](uint16_t a, bool b){ExecCMP(a,b);}}}, {0xCD, {CMP, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecCMP(a,b);}}},
+            {0xDD, {CMP, AbsoluteX, 3, 4, 1, [&](uint16_t a, bool b){ExecCMP(a,b);}}}, {0xD9, {CMP, AbsoluteY, 3, 4, 1, [&](uint16_t a, bool b){ExecCMP(a,b);}}},
+            {0xC1, {CMP, IndexedIndirect, 2, 6, 0, [&](uint16_t a, bool b){ExecCMP(a,b);}}}, {0xD1, {CMP, IndirectIndexed, 2, 5, 1, [&](uint16_t a, bool b){ExecCMP(a,b);}}},
 
             // CPX
-            {0xE0, {CPX, Immediate, 2, 2, 0, execCPX}}, {0xE4, {CPX, ZeroPage, 2, 3, 0, execCPX}},
-            {0xEC, {CPX, Absolute, 3, 4, 0, execCPX}},
+            {0xE0, {CPX, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecCPX(a,b);}}}, {0xE4, {CPX, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecCPX(a,b);}}},
+            {0xEC, {CPX, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecCPX(a,b);}}},
 
             // CPY
-            {0xC0, {CPY, Immediate, 2, 2, 0, execCPY}}, {0xC4, {CPX, ZeroPage, 2, 3, 0, execCPY}},
-            {0xCC, {CPY, Absolute, 3, 4, 0, execCPY}},
+            {0xC0, {CPY, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecCPY(a,b);}}}, {0xC4, {CPX, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecCPY(a,b);}}},
+            {0xCC, {CPY, Absolute, 3, 4, 0, [&](uint16_t a, bool b){ExecCPY(a,b);}}},
 
             // INC
-            {0xE6, {INC, ZeroPage, 2, 5, 0, execINC}}, {0xF6, {INC, ZeroPageX, 2, 6, 0, execINC}},
-            {0xEE, {INC, Absolute, 3, 6, 0, execINC}}, {0xFE, {INC, AbsoluteX, 3, 6, 1, execINC}},
+            {0xE6, {INC, ZeroPage, 2, 5, 0, [&](uint16_t a, bool b){ExecINC(a,b);}}}, {0xF6, {INC, ZeroPageX, 2, 6, 0, [&](uint16_t a, bool b){ExecINC(a,b);}}},
+            {0xEE, {INC, Absolute, 3, 6, 0, [&](uint16_t a, bool b){ExecINC(a,b);}}}, {0xFE, {INC, AbsoluteX, 3, 6, 1, [&](uint16_t a, bool b){ExecINC(a,b);}}},
 
             // DEC
-            {0xC6, {DEC, ZeroPage, 2, 5, 0, execDEC}}, {0xD6, {DEC, ZeroPageX, 2, 6, 0, execDEC}},
-            {0xCE, {DEC, Absolute, 3, 6, 0, execDEC}}, {0xDE, {DEC, AbsoluteX, 3, 6, 1, execDEC}},
+            {0xC6, {DEC, ZeroPage, 2, 5, 0, [&](uint16_t a, bool b){ExecDEC(a,b);}}}, {0xD6, {DEC, ZeroPageX, 2, 6, 0, [&](uint16_t a, bool b){ExecDEC(a,b);}}},
+            {0xCE, {DEC, Absolute, 3, 6, 0, [&](uint16_t a, bool b){ExecDEC(a,b);}}}, {0xDE, {DEC, AbsoluteX, 3, 6, 1, [&](uint16_t a, bool b){ExecDEC(a,b);}}},
 
             // DE{X,Y} / IN{X,Y}
-            {0xE8, {INX, Implied, 1, 2, 0, execINX}}, {0xCA, {DEX, Implied, 1, 2, 0, execDEX}},
-            {0xC8, {INY, Implied, 1, 2, 0, execINY}}, {0x88, {DEY, Implied, 1, 2, 0, execDEY}},
+            {0xE8, {INX, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecINX(a,b);}}}, {0xCA, {DEX, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecDEX(a,b);}}},
+            {0xC8, {INY, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecINY(a,b);}}}, {0x88, {DEY, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecDEY(a,b);}}},
 
             // CL{C,I,D,V} / SE{C, I, D}
-            {0x18, {CLC, Implied, 1, 2, 0, execCLC}}, {0x38, {SEC, Implied, 1, 2, 0, execSEC}},
-            {0x58, {CLI, Implied, 1, 2, 0, execCLI}}, {0x78, {SEI, Implied, 1, 2, 0, execSEI}},
-            {0xD8, {CLD, Implied, 1, 2, 0, execCLD}}, {0xF8, {SED, Implied, 1, 2, 0, execSED}},
-            {0xB8, {CLV, Implied, 1, 2, 0, execCLV}},
+            {0x18, {CLC, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecCLC(a,b);}}}, {0x38, {SEC, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecSEC(a,b);}}},
+            {0x58, {CLI, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecCLI(a,b);}}}, {0x78, {SEI, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecSEI(a,b);}}},
+            {0xD8, {CLD, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecCLD(a,b);}}}, {0xF8, {SED, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecSED(a,b);}}},
+            {0xB8, {CLV, Implied, 1, 2, 0, [&](uint16_t a, bool b){ExecCLV(a,b);}}},
 
             // LDA
             {0xA9, {LDA, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecLDA(a,b);}}}, {0xA5, {LDA, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecLDA(a,b);}}},
