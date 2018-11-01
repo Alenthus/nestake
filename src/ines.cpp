@@ -14,10 +14,16 @@ namespace nestake {
         }
 
         inesHeader h = inesHeader{};
+        uint8_t nesMagic[8]={};
 
-        std::fread(&h, 1, 16, f);
+        std::fread(nesMagic, 1, 8, f);
+
         // read header
-        std::cout << "h.magic: " << int(h.magic) << "\n";
+        std::cout << "\n\n\nh.magic: " << nesMagic[0] << "\n";
+        std::cout << "\n\n\nh.magic: " << nesMagic[1] << "\n";
+        std::cout << "\n\n\nh.magic: " << nesMagic[2] << "\n";
+        std::cout << "\n\n\nh.magic: " << nesMagic[7] << "\n";
+
     }
 
 

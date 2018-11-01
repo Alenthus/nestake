@@ -4,6 +4,6 @@
 #include <iostream>
 
 TEST(INESTEST, Initialization) {
-    std::string path = "../../../resources/read_test.nes";
+    std::string path = "../../resources/read_test.nes";
     nestake::Cartridge c = nestake::Cartridge{path};
 }
