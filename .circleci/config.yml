@@ -10,6 +10,5 @@ jobs:
     - run: apt-get -y install git
     - checkout
     - run: mkdir cmake && cd cmake && git clone https://github.com/Crascit/DownloadProject
-    - run: cmake .
-    - run: make
-    - run: make test
+    - run: mkdir build
+    - run: cd build && cmake .. && make && make test
