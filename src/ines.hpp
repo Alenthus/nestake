@@ -14,7 +14,6 @@ namespace nestake{
         uint8_t Mirror;
         explicit Cartridge(std::string);
     };
-
 }
 
 #endif
