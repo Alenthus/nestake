@@ -6,8 +6,8 @@
 namespace nestake {
 
     void Console::Step() {
-        uint64_t cpu_cycle = CPU->Step();
-        std::cout << "cpu cycle: " << cpu_cycle << "\n";
+        uint64_t cpuCycle = CPU->Step();
+        std::cout << "cpu cycle: " << cpuCycle << "\n";
 
         // TODO: implement {PPU|Mapper|APU}.Step()
     }

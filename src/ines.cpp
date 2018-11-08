@@ -1,10 +1,7 @@
-
 #include <iostream>
 #include <fstream>
 #include "ines.hpp"
 
-// Ref: https://wiki.nesdev.com/w/index.php/INES
-// 4e45 531a 0201 0100 0000 0000 0000 0000
 namespace nestake {
 
     // check magic number from header
@@ -47,21 +44,16 @@ namespace nestake {
         }
 
         // flag 6
-        uint8_t  control1;
+        uint8_t control1;
         std::fread(&control1, 1, 1, f);
 
         // flag 7
-        uint8_t  control2;
+        uint8_t control2;
         std::fread(&control2, 1, 1, f);
 
         // define mapper
-        uint8_t mapper1 = control1 >> 4;
-        uint8_t mapper2 = control2 >> 4;
-        Mapper = mapper1 | (mapper2 << 1);
-
-        mapper1 = control1 & uint8_t(1);
-        mapper2 = (control1 >>3) & uint8_t(1);
-        Mirror = mapper1 | (mapper2 << 1);
+        Mapper = (control2 & uint8_t(0b11110000)) | (control1 & uint8_t(0b00001111));
+        Mirror = (control1 & uint8_t(0b00000001)) | (control1 & uint8_t(0b00000100) << 1);
 
         // padding
         std::fread(new(uint8_t[8]), 1, 8, f);
