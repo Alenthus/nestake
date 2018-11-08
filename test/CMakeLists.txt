@@ -18,3 +18,7 @@ gtest_add_tests(TARGET TestCPU)
 add_executable(TestINES ines_test.cpp)
 target_link_libraries(TestINES ines gtest_main)
 gtest_add_tests(TARGET TestINES)
+
+add_executable(TestConsole console_test.cpp)
+target_link_libraries(TestConsole console gtest_main)
+gtest_add_tests(TARGET TestConsole)

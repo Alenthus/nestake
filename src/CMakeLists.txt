@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
 add_library(cpu cpu.cpp)
 add_library(memory memory.cpp)
-add_library(ines ines.cpp)
+add_library(ines ines.cpp cpu.cpp)
+add_library(console console.cpp)
