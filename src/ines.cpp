@@ -52,8 +52,8 @@ namespace nestake {
         std::fread(&control2, 1, 1, f);
 
         // define mapper
-        Mapper = (control2 & uint8_t(0b11110000)) | (control1 & uint8_t(0b00001111));
-        Mirror = (control1 & uint8_t(0b00000001)) | (control1 & uint8_t(0b00000100) << 1);
+        Mapper = (control2 & uint8_t(0b11110000)) | ((control1 & uint8_t(0b11110000)) >> 4);
+        Mirror = (control1 & uint8_t(0b00000001)) | (control1 & uint8_t(0b00000100));
 
         // padding
         std::fread(new(uint8_t[8]), 1, 8, f);
