@@ -40,8 +40,8 @@ namespace nestake {
         // debug flag
         bool IsDebugMode;
 
-        // pointer to NesMemory interface
-        std::shared_ptr<Memory> mem;
+        // pointer to CPUMemory
+        std::shared_ptr<CPUMemory> mem;
 
         // cpu cycles
         uint64_t Cycles;
@@ -157,7 +157,7 @@ namespace nestake {
         void ExecTYA(uint16_t, bool);
 
         // setup (instruction table)
-        explicit Cpu(std::shared_ptr<Memory>);
+        explicit Cpu(std::shared_ptr<CPUMemory>);
     };
 
     // struct consisting of information for instruction execution

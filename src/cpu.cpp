@@ -713,8 +713,7 @@ namespace nestake {
         return Cycles - prev_cycles;
     }
 
-    // [&](uint16_t a, bool b){_php(a, b);}
-    Cpu::Cpu(std::shared_ptr<Memory> m) {
+    Cpu::Cpu(std::shared_ptr<CPUMemory> m) {
         // setup instruction table
         // ref: http://pgate1.at-ninja.jp/NES_on_FPGA/nes_cpu.htm#instruction
         InstructionTable = {

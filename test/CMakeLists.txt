@@ -22,3 +22,7 @@ gtest_add_tests(TARGET TestINES)
 add_executable(TestConsole console_test.cpp)
 target_link_libraries(TestConsole console gtest_main)
 gtest_add_tests(TARGET TestConsole)
+
+add_executable(TestPPU ppu_test.cpp)
+target_link_libraries(TestPPU ppu gtest_main)
+gtest_add_tests(TARGET TestPPU)

@@ -5,9 +5,15 @@
 #include <stdint.h>
 
 namespace nestake {
-    class Memory {
+    class CPUMemory {
     public:
         std::array<uint8_t, 2048> RAM;
+        uint8_t Read(uint16_t address);
+        void Write(uint16_t address, uint8_t value);
+    };
+
+    class PPUMemory {
+    public:
         uint8_t Read(uint16_t address);
         void Write(uint16_t address, uint8_t value);
     };
