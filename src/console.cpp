@@ -1,7 +1,6 @@
-#include "cpu.hpp"
-#include "console.hpp"
 #include <iostream>
 
+#include "console.hpp"
 
 namespace nestake {
 

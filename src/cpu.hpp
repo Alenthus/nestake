@@ -4,14 +4,38 @@
 #include <array>
 #include <functional>
 #include <map>
+#include <memory>
 #include <stdint.h>
 #include <string>
 
 #include "memory.hpp"
-#include<memory>
 
 namespace nestake {
     class Cpu {
+    private:
+        // struct consisting of information for instruction execution
+        struct instructionParams {
+            // instruction's id
+            uint8_t ID;
+
+            // addressing mode
+            uint8_t AddressingMode;
+
+            // the size of each instruction in byte
+            uint8_t InstructionSizes;
+
+            // the number of cycles used by the instruction
+            uint8_t InstructionCycle;
+
+            // the number of page cycles used by the instruction
+            uint8_t PageCycle;
+
+            std::function<void (uint16_t, bool)> executor;
+        };
+
+        // map of all instructions
+        std::map<uint8_t , instructionParams> instructionTable;
+        std::map<int, std::string> idToInstructionName;
     public:
         // flag related
         uint8_t getFlag();
@@ -159,30 +183,6 @@ namespace nestake {
         // setup (instruction table)
         explicit Cpu(std::shared_ptr<CPUMemory>);
     };
-
-    // struct consisting of information for instruction execution
-    struct InstructionParams {
-        // instruction's id
-        uint8_t ID;
-
-        // addressing mode
-        uint8_t AddressingMode;
-
-        // the size of each instruction in byte
-        uint8_t InstructionSizes;
-
-        // the number of cycles used by the instruction
-        uint8_t InstructionCycle;
-
-        // the number of page cycles used by the instruction
-        uint8_t PageCycle;
-
-        std::function<void (uint16_t, bool)> executor;
-    };
-
-    // map of all instructions
-    std::map<uint8_t , InstructionParams> InstructionTable;
-    std::map<int, std::string> idToInstructionName;
 
     bool isPageCrossed(uint16_t, uint16_t);
 }

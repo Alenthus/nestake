@@ -2,7 +2,6 @@
 #include <string>
 
 #include "cpu.hpp"
-#include "memory.cpp"
 
 using std::array;
 using std::cout;
@@ -636,7 +635,7 @@ namespace nestake {
 
         // read opcode
         uint8_t op = mem->Read(PC);
-        InstructionParams inst = InstructionTable[op];
+        instructionParams inst = instructionTable[op];
 
         // switch the instruction's condition according to the addressing mode
         switch (inst.AddressingMode) {
@@ -716,7 +715,7 @@ namespace nestake {
     Cpu::Cpu(std::shared_ptr<CPUMemory> m) {
         // setup instruction table
         // ref: http://pgate1.at-ninja.jp/NES_on_FPGA/nes_cpu.htm#instruction
-        InstructionTable = {
+        instructionTable = {
             // ADC
             {0x69, {ADC, Immediate, 2, 2, 0, [&](uint16_t a, bool b){ExecADC(a,b);}}},
             {0x65, {ADC, ZeroPage, 2, 3, 0, [&](uint16_t a, bool b){ExecADC(a,b);}}},
