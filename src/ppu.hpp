@@ -38,8 +38,12 @@ namespace nestake {
         std::array<uint8_t, 32> paletteData;
         std::array<uint8_t, 2048> nameTableData;
         std::array<uint8_t, 256> oamData;
-        std::array<color, 256*240> front;
-        std::array<color, 256*240> back;
+
+        // used for actual displaying
+        std::array<color, 256*240> currentImage;
+
+        // used for rendering during vblank timing
+        std::array<color, 256*240> renderingImage;
 
         // NMI flags
         bool nmiOccurred;

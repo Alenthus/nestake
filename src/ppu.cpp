@@ -39,6 +39,21 @@ namespace nestake {
         ++oamAddress;
     }
 
-    void PPU::writeControl(uint8_t v) {};
-    void PPU::writeMask(uint8_t v) {};
+    // 0x2000
+    void PPU::writeControl(uint8_t v) {
+
+    };
+
+    void PPU::writeMask(uint8_t v) {
+        flagGrayscale = v & uint8_t(1);
+        flagShowLeftBackground = (v >> 1) & (uint8_t(1));
+        flagShowLeftSprites = (v >> 2) & (uint8_t(1));
+        flagShowBackground = (v >> 3) & (uint8_t(1));
+        flagShowSprites = (v >> 4) & (uint8_t(1));
+        flagRedTint = (v >> 5) & (uint8_t(1));
+        flagGreenTint = (v >> 6) & (uint8_t(1));
+        flagBlueTint = (v >> 7) & (uint8_t(1));
+    };
+
+
 }
