@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 namespace nestake{
     class Cartridge {
     public:

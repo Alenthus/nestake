@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.12)
 project(nestake CXX)
-add_executable(nestake main.cpp)
+add_executable(
+        nestake main.cpp
+        src/cpu.cpp
+        src/console.cpp
+        src/ines.cpp
+        src/memory.cpp
+        src/ppu.cpp
+)
 
 set(CMAKE_CXX_STANDARD 11)
 include(CheckCXXCompilerFlag)

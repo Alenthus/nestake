@@ -5,7 +5,7 @@
 #include "memory.hpp"
 
 namespace nestake {
-    uint8_t Memory::Read(uint16_t address) {
+    uint8_t CPUMemory::Read(uint16_t address) {
         if (address < 0x2000) {
             return RAM[address%0x800];
         } else if (address < 0x4000) {
@@ -30,7 +30,7 @@ namespace nestake {
         return 0;
     }
 
-    void Memory::Write(uint16_t address, uint8_t value) {
+    void CPUMemory::Write(uint16_t address, uint8_t value) {
         if (address < 0x2000) {
             RAM[address%0x0800] = value;
         } else if (address < 0x4000) {
@@ -46,5 +46,16 @@ namespace nestake {
         } else if (address >= 0x4020) {
             // TODO: write from mapper
         }
+    }
+
+
+    uint8_t PPUMemory::Read(uint16_t address) {
+        // TODO:
+        return 0;
+    }
+
+
+    void PPUMemory::Write(uint16_t address, uint8_t value) {
+        // TODO:
     }
 }

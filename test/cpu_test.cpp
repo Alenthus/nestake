@@ -4,7 +4,7 @@
 #include <iostream>
 
 TEST(CPUTest, Initialization) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     // TODO: change `0` to appropriate one after implementing mapper
     EXPECT_EQ(0, cpu.PC);
@@ -25,7 +25,7 @@ TEST(CPUTest, isPageCrossed) {
 }
 
 TEST(CPUTest, compare) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.compare(0x0000, 0x0000);
     EXPECT_EQ(1, cpu.C);
@@ -40,7 +40,7 @@ TEST(CPUTest, compare) {
 }
 
 TEST(CPUTest, READ16) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     mem->RAM[0] = 0x02;
     mem->RAM[1] = 0x10;
@@ -51,7 +51,7 @@ TEST(CPUTest, READ16) {
 
 
 TEST(CPUTest, READ16Bug) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     mem->RAM[0x0000] = 0x02;
     mem->RAM[0x0100] = 0x33;
@@ -62,7 +62,7 @@ TEST(CPUTest, READ16Bug) {
 }
 
 TEST(CPUTest, PUSH) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0x10;
     cpu.push(0x99);
@@ -75,7 +75,7 @@ TEST(CPUTest, PUSH) {
 }
 
 TEST(CPUTest, PULL) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0x10;
     cpu.mem->RAM[0x0111] = 0x96;
@@ -86,7 +86,7 @@ TEST(CPUTest, PULL) {
 }
 
 TEST(CPUTest, PULL16) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0x10;
     cpu.mem->RAM[0x0111] = 0x96;
@@ -98,7 +98,7 @@ TEST(CPUTest, PULL16) {
 }
 
 TEST(CPUTest, GetFlag) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.C = 1;
     cpu.Z = 0;
@@ -114,7 +114,7 @@ TEST(CPUTest, GetFlag) {
 
 
 TEST(CPUTest, SetFlags) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.setFlags(0b10001001);
     EXPECT_EQ(1, cpu.C);
@@ -128,7 +128,7 @@ TEST(CPUTest, SetFlags) {
 }
 
 TEST(CPUTest, ADC) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
 
     // Neither overflow nor carry case
@@ -173,7 +173,7 @@ TEST(CPUTest, ADC) {
 }
 
 TEST(CPUTest, AND) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.A = 0b10000001;
     cpu.mem->RAM[0x0000] = 0b10000000;
@@ -185,7 +185,7 @@ TEST(CPUTest, AND) {
 }
 
 TEST(CPUTest, ASL) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
 
     // accumulator mode
@@ -205,7 +205,7 @@ TEST(CPUTest, ASL) {
 }
 
 TEST(CPUTest, BCC) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.C = 0;
     cpu.Cycles = 0;
@@ -222,7 +222,7 @@ TEST(CPUTest, BCC) {
 }
 
 TEST(CPUTest, BIT) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.A = 0b00000001;
     mem->RAM[0] = 0b11000000;
@@ -233,7 +233,7 @@ TEST(CPUTest, BIT) {
 }
 
 TEST(CPUTest, CMP) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.A = 1;
     mem->RAM[0] = 0;
@@ -245,7 +245,7 @@ TEST(CPUTest, CMP) {
 }
 
 TEST(CPUTest, DEC) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     mem->RAM[0] = 1;
 
@@ -256,7 +256,7 @@ TEST(CPUTest, DEC) {
 }
 
 TEST(CPUTest, DEX) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.X = 100;
 
@@ -267,7 +267,7 @@ TEST(CPUTest, DEX) {
 }
 
 TEST(CPUTest, EOR) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     mem->RAM[0] = 0b10000001;
     cpu.A   = 0b10001000;
@@ -279,7 +279,7 @@ TEST(CPUTest, EOR) {
 }
 
 TEST(CPUTest, INC) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     mem->RAM[0] = 1;
 
@@ -290,7 +290,7 @@ TEST(CPUTest, INC) {
 }
 
 TEST(CPUTest, JSR) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.PC = 100;
     cpu.ExecJSR(0, false);
@@ -298,7 +298,7 @@ TEST(CPUTest, JSR) {
 }
 
 TEST(CPUTest, LDA) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     mem->RAM[0] = 100;
 
@@ -307,7 +307,7 @@ TEST(CPUTest, LDA) {
 }
 
 TEST(CPUTest, LSR) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
 
     //  accumulator mode
@@ -324,7 +324,7 @@ TEST(CPUTest, LSR) {
 }
 
 TEST(CPUTest, ORA) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     mem->RAM[0] = 0b00000011;
     cpu.A = 0b10000000;
@@ -335,7 +335,7 @@ TEST(CPUTest, ORA) {
 }
 
 TEST(CPUTest, PHP) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.C = 1;
     cpu.Z = 0;
@@ -354,7 +354,7 @@ TEST(CPUTest, PHP) {
 }
 
 TEST(CPUTest, PLP) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0b10000000;
     mem->RAM[0x100|0b10000001] = 0b00000010;
@@ -364,7 +364,7 @@ TEST(CPUTest, PLP) {
 }
 
 TEST(CPUTest, ROL) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
 
     // accumulator mode
@@ -381,7 +381,7 @@ TEST(CPUTest, ROL) {
 }
 
 TEST(CPUTest, ROR) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
 
     // accumulator mode
@@ -398,7 +398,7 @@ TEST(CPUTest, ROR) {
 }
 
 TEST(CPUTest, RTI) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 0;
     mem->RAM[0b00000001|0x100] = 0b00000011;
@@ -409,7 +409,7 @@ TEST(CPUTest, RTI) {
 }
 
 TEST(CPUTest, RTS) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
     cpu.SP = 10;
     mem->RAM[0x100|11] = 0x55;
@@ -420,7 +420,7 @@ TEST(CPUTest, RTS) {
 }
 
 TEST(CPUTest, SBC) {
-    std::shared_ptr<nestake::Memory> mem(std::make_shared<nestake::Memory>());
+    std::shared_ptr<nestake::CPUMemory> mem(std::make_shared<nestake::CPUMemory>());
     nestake::Cpu cpu = nestake::Cpu(mem);
 
     // Neither overflow nor carry case

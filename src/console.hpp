@@ -1,7 +1,9 @@
-#include <utility>
+#ifndef CONSOLE_CPU
+#define CONSOLE_CPU
 
-#include "cpu.cpp"
-#include "ines.cpp"
+#include <utility>
+#include "cpu.hpp"
+#include "ines.hpp"
 
 namespace nestake {
     class Console {
@@ -20,3 +22,5 @@ namespace nestake {
         void Step();
     };
 }
+
+#endif
